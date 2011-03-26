@@ -1,0 +1,41 @@
+
+Goals:
+To build a distributed bookmark service, which is easy to bookmark, tag, and share web-based information in a robust way, where data is controlled and owned by users.
+
+Seconday Goal:
+To build infrasructure for other distributed p2p data sharing systems.
+
+Seconday Goal:
+To build a 'friends bookmarks' search system, whereby it is easy to search friends bookmarks for best search results.
+
+Secret Goal:
+To build infrastructure for a 'Moglen Box'  
+
+
+Technology Overview:
+Overview is broken down into procelin (UI/user stuff) and brass(plumbing/tools)
+
+Porcelin:
+	A simple web portal that can be run locally 
+	A firefox plugin that can use keyboard shortcuts to save/fetch.
+	A firefox search plugin/tool 
+
+Brass:
+	git directory with code/tools for repository
+	git directory of public (world + dog viewable) tags listings and metadata
+	git directory of private(encrypted, pw protected maybe?) tags, status, notifications
+	git directory of local search data (optional) for processing
+	git based service on the web to sync public/private data to/from when offfline
+	json files for each bookmark
+	cache of recent searches, requests, etc for search data or user data
+	
+Brass Filesystem Overview
+	- /tools - directory containing code for duing gitmarks actions (link to other git repo type A)
+	
+	- /public - directory containing gitmark files for each bookarm (links to other git repo type B, world+dog can read)  
+	- /private - directory containing encrypted gitmark files to/from other users. (links to other git repo type C, many can read)  
+		/tags - stats and tags in private
+		/posted - encrypted or plaintext bookmarks 'sent' from friends
+	
+	- /content - (optional) local content (scraped pages, stats, info, tags info, etc) (can be synced to git repo type C)
+	
