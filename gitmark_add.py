@@ -545,8 +545,9 @@ class gitmark(object):
 #		 return content
 
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
+	""" Function to run if we are running at the commandline"""
 	# -- parse command line options
 	parser = OptionParser("usage: %prog [options] uri")
 
