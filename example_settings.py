@@ -1,7 +1,7 @@
 
 ## Local File Settings:
 # -- Core Dirs
-GITMARK_BASE_DIR = '../gitmark_base' # base directory for gitmarks resources
+GITMARK_BASE_DIR = 'gitmark_base' # base directory for gitmarks resources
 PUBLIC_GITMARK_REPO_DIR = 'public' # public subdirectory for gitmarks local resources
 PRIVATE_GITMARK_REPO_DIR = 'private' # private subdirectory for gitmarks local resources
 CONTENT_GITMARK_DIR = 'content' #optional local content directories
@@ -12,8 +12,8 @@ MSG_SUB_PATH = 'msg' #local messages/push data subdirectory
 HTML_SUB_PATH = 'html' #local content subdirectory
 
 ## Remote Repository Info
-REMOTE_PUBLIC_REPO = 'git@github.com:FarMcKon/gitmarks_pub.git'
-REMOTE_PRIVATE_REPO = 'git@github.com:FarMcKon/gitmarks_private.git'
+REMOTE_PUBLIC_REPO = None
+REMOTE_PRIVATE_REPO = None 
 REMOTE_CONTENT_REPO = None #optional content repository
 
 # Content fetch settings
@@ -25,6 +25,10 @@ CONTENT_CACHE_SIZE_MB = 400
 GITMARKS_WEB_PORT = 44865
 
 # TOOD: make config create or grab or fetch this info
-USER_NAME ="FarMcKon"
-USER_CONTACT="FarMcKon@gmail.com"
-MACHINE_NAME="Pierre Aronnax"
+USER_NAME ="Example Name"
+USER_EMAIL="ExampleName@example.com"
+MACHINE_NAME="Example Computer Name"
+
+# Other Stuff
+FAVORITE_COLOR = "Red"
+UNLADEN_SWALLOW_GUESS = "I don't know"

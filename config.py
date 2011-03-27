@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+Configuration script for gitmarks.py
+"""
 
-import settings
+import example_settings as settings
 import os
 import subprocess
-
+import shutil
 
 # Arguments are passed directly to git, not through the shell, to avoid the
 # need for shell escaping. On Windows, however, commands need to go through the
@@ -11,64 +16,96 @@ import subprocess
 USE_SHELL = os.name == 'nt'
 
 def configure_gitmarks():
+	# -- pull needed libraries from the net
+	download_needed_software()
+	
+	# -- generate our configuration settings
+	dict = config_settings_from_user()
 
-download_needed_software()
-#	dict = config_settings_from_user()
-#	
-#	#debug printout
-#	print "debugging printout of values:"
-#	print dict	
-#
-#
-#	cont = getYesNoFromUser("Store Settings, Setup up local stuff from above settings??",True)
-#	if not cont:
-#		print" ok. goodbye. Share and Enjoy"
-#		return 0
-#	
-#	# -- store updated settings to settings.py, and reload
-#	success = replace_value_in_file(dict,'settings.py')
-#	if success :	
-#		reload(settings) #TRICKY: we are reloading settings from a file we just wrote
-#						#we do this, because we love danger!
-#	else:
-#		print "failed to store updated settings " + str(dict)
-#		return -5
-
+	cont = getYesNoFromUser("Store Settings, Setup up local stuff from above settings??",True)
+	if not cont:
+		print" Note: In beta, you must store setting. Can't continue without them"
+		print "sorry. Beta and all, you know how it is. Share and Enjoy"
+		return 0
+	
+	# -- store updated settings to settings.py, and reload
+	success = create_or_update_settings(dict,'settings.py', 'example_settings.py')
+	if success :	
+		reload(settings) # TRICKY: we are reloading settings from a ...
+			# file we just created/updated. We do this, because we love danger!
+	else:
+		print "failed to store updated settings " + str(dict)
+		print " sorry our beta sucks. We are working on it! "
+		return -5
+		
+	# -- well, we got this far. Lets make some folders
 	create_local_gitmarks_folders()
+	print "We think we just setup your local system. God knows, we may have succeeded!"
+
 
 def download_needed_software():
 	# wget http://python-gnupg.googlecode.com/files/python-gnupg-0.2.6.tar.gz
 	# or get gpg or pgp instead?
+	print "TODO: Download prerequsite software"
+	pass
 	
 def create_local_gitmarks_folders():
+	""" This function creates local repository folders. If we have a remote repo name, it will try to sync that data to this place.  If the settings remote repository info is "None" it will just create a local repo without a remote connection"""
+	
+	abs_base_dir =  os.path.abspath(settings.GITMARK_BASE_DIR)
 
-	# -- Create our local 'private' repository`
-	private_gitmark_dir = os.path.join(settings.GITMARK_BASE_DIR, settings.PRIVATE_GITMARK_REPO_DIR)
-	if not folder_is_git_repo(private_gitmark_dir) :
-		ret = clone_to_local(settings.GITMARK_BASE_DIR, private_gitmark_dir, settings.REMOTE_PRIVATE_REPO)		
-		#print 'hack exit'
-		#return
-		
-		if(ret != 0):
-			print "clone to local failed"
-			return -9
-		make_gitmark_subdirs(private_gitmark_dir, [settings.BOOKMARK_SUB_PATH, 
-		settings.TAG_SUB_PATH, settings.MSG_SUB_PATH])
-	else :
-		print "failsauce on creating private repo\ndir:\t%s\nrepo:\t%s" %  (private_gitmark_dir, settings.REMOTE_PRIVATE_REPO)
+	# -- Create a base directory if we need to 
+	if not os.path.isdir(abs_base_dir):
+		print " creating base directory for gitmarks"
+		subprocess.call(['mkdir', abs_base_dir], shell=USE_SHELL)
 
-	# -- Create our local 'public' repository`
-	public_gitmark_dir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
-	if not folder_is_git_repo(public_gitmark_dir) :
-		ret = clone_to_local(settings.GITMARK_BASE_DIR, public_gitmark_dir, settings.REMOTE_PUBLIC_REPO)		
-		if(ret != 0):
-			print "clone to local failed"
-			return -9
-		make_gitmark_subdirs(public_gitmark_dir, [settings.BOOKMARK_SUB_PATH, 
-		settings.TAG_SUB_PATH, settings.MSG_SUB_PATH])
+	public_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
 
-	else :
-		print "failsauce on creating public repo\ndir:\t%s\nrepo:\t%s" %  (public_gitmark_dir, settings.REMOTE_PUBLIC_REPO)
+	# -- if we have a remote public repo, try to git-clone to create a local copy.
+	if(settings.REMOTE_PUBLIC_REPO != None):
+		if not folder_is_git_repo(public_gitmarks_dir) :
+			ret = clone_to_local(settings.GITMARK_BASE_DIR, public_gitmarks_dir, 	settings.REMOTE_PUBLIC_REPO)				
+			if(ret != 0):
+				print "remote public clone to local failed"
+				return -9
+	# -- no remote public repo, make a dir and git-init it as needed
+	else: 	
+		abs_public_gitmarks_dir = os.path.abspath(public_gitmarks_dir)
+		# -- create a dir if we need to.
+		if not os.path.isdir(abs_public_gitmarks_dir):	
+			subprocess.call(['mkdir', abs_public_gitmarks_dir], shell=USE_SHELL)
+		# -- init the new git repo in that dir
+		cwd_dir = os.path.abspath(os.getcwd())
+		os.chdir(os.path.abspath(abs_public_gitmarks_dir))
+		ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
+		os.chdir(cwd_dir)
+		# -- create our sub-dirs if needed
+		make_gitmark_subdirs(abs_public_gitmarks_dir, [settings.BOOKMARK_SUB_PATH, 	settings.TAG_SUB_PATH, settings.MSG_SUB_PATH])
+
+
+	private_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR, settings.PRIVATE_GITMARK_REPO_DIR)
+
+
+	# -- if we have a remote private repo, try to git-clone to create a local copy.
+	if(settings.REMOTE_PRIVATE_REPO != None):
+		if not folder_is_git_repo(private_gitmarks_dir) :
+			ret = clone_to_local(settings.GITMARK_BASE_DIR, private_gitmarks_dir, 	settings.REMOTE_PRIVATE_REPO)				
+			if(ret != 0):
+				print "remote public clone to local failed"
+				return -9
+	# -- no remote private repo, make a dir and git-init it as needed
+	else: 	
+		abs_private_gitmarks_dir = os.path.abspath(private_gitmarks_dir)
+		# -- create a dir if we need to.
+		if not os.path.isdir(abs_private_gitmarks_dir):	
+			subprocess.call(['mkdir', abs_private_gitmarks_dir], shell=USE_SHELL)
+		# -- init the new git repo in that dir
+		cwd_dir = os.path.abspath(os.getcwd())
+		os.chdir(os.path.abspath(abs_private_gitmarks_dir))
+		ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
+		os.chdir(cwd_dir)
+		# -- create our sub-dirs if needed
+		make_gitmark_subdirs(abs_private_gitmarks_dir, [settings.BOOKMARK_SUB_PATH, 	settings.TAG_SUB_PATH, settings.MSG_SUB_PATH])
 
 	# -- Create our local content directory and repo, even if we never use it
 	content_dir =  os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR)
@@ -85,9 +122,10 @@ def create_local_gitmarks_folders():
 
 	
 def clone_to_local(baseDir, folderName, remoteGitRepo):
-	""" clones a repository at remoteGitRepo to a local directory """
+	"""Clones a repository at remoteGitRepo to a local directory"""
 	print "cloning repository %s to directory %s" %(remoteGitRepo, folderName)
-	#swizzle our process locaiton so that we get added to the right repo
+
+	#swizzle our process location so that we get added to the right repo
 	baseDir = os.path.abspath(baseDir)
 	cwd_dir = os.path.abspath(os.getcwd())
 	os.chdir(os.path.abspath(baseDir))
@@ -146,9 +184,18 @@ def config_settings_from_user():
 	if content_as_reop is True:
 		remote_content_repo = getStringFromUser('what is the git repository for your content?', settings.REMOTE_CONTENT_REPO)
 
+	print "-- Pointless Info --"
 	fav_color= getStringFromUser('what is your favorite color?',settings.FAVORITE_COLOR)
-
 	wv_u_swallow = getStringFromUser('what is the windspeed velocity of an unladen swallow?',settings.UNLADEN_SWALLOW_GUESS)
+
+	print "-- User Info --"
+	user_name = getStringFromUser("what username do you want to use?", settings.USER_NAME)
+	user_email = getStringFromUser("what email do you want to use?", settings.USER_EMAIL)
+	machine_name = getStringFromUser("what is the name of this computer?", settings.MACHINE_NAME)
+MACHINE_NAME="Example Computer Name"
+
+
+
 
 	dict = { 'GITMARK_BASE_DIR':base_dir, 'GET_CONTENT':get_content,
 	'CONTENT_CACHE_SIZE_MB':content_cache_mb,
@@ -160,40 +207,55 @@ def config_settings_from_user():
 	'PRIVATE_GITMARK_REPO_DIR':settings.PRIVATE_GITMARK_REPO_DIR,
 	'CONTENT_GITMARK_DIR':settings.CONTENT_GITMARK_DIR, 'BOOKMARK_SUB_PATH':settings.BOOKMARK_SUB_PATH,
 	'TAG_SUB_PATH':settings.TAG_SUB_PATH, 'MSG_SUB_PATH':settings.MSG_SUB_PATH,
-	'HTML_SUB_PATH':settings.HTML_SUB_PATH}
-
+	'HTML_SUB_PATH':settings.HTML_SUB_PATH
+	'USER_NAME':user_name,
+	'USER_EMAIL':user_email,
+	'MACHINE_NAME':machine_name
+	}
 	return dict
 		
 	
-def replace_value_in_file(dict,setings_filename):	
+def create_or_update_settings(dict,settings_filename, opt_example_file=None):	
 	""" 
 	Does some magic to read a settings file, and replace the values in-line,
 	and then write the new values back to the settings file.
 	"""
-	fh = open(setings_filename,'r')
+	if not (os.path.isfile(settings_filename)):
+		if not (opt_example_file):
+			print "can't update a nonexistant file, no existing %s. Add an example file"
+			exit(-10); #FAIL
+		shutil.copy(opt_example_file, settings_filename)
+	
+	fh = open(settings_filename,'r')
 	raw_settings = fh.readlines()
 	fh.close()
 	newlines = []
 	for line in raw_settings:
-		newline = line
-		#print 'cur line: ' + line
+		newline = line.rstrip()
 		if '=' in line:
-			#print 'has ='
-			val = line.split('=')[0]
 			comment = None
+			val = None
+			var = None
+			print 'on line "' + newline + '"'
 			if( line.split('#') < 1 ):
 				comment = line.split('#')[-1]
-			#print 'has comment ' + str(comment)
+				print '\thas comment ' + str(comment)				
+			var = line.split('=')[0]
+			val = ''.join(line.split('=')[1:])
+			var = var.lstrip().rstrip()
 			val = val.lstrip().rstrip()
-			if val in dict:
-				newline = val + ' = ' + str(dict[val])
-				if comment != None:
+			print '\tupdating var ' + str(var) +' old val ' +str(val) 
+			if var in dict:
+				newline = var + ' = ' + str(dict[var])
+				if comment:
 					newline += ' # ' + comment
-		#print 'new line = ' + newline
+			print 'updated line "' + newline + '"'
+		else:
+			print 'no update on "' + newline + '"'
 		newlines.append(newline)
 	if len(newlines) == len(raw_settings):
-		fh = open(setings_filename +".tmp",'w')
-		fh.write(newlines)
+		fh = open(settings_filename +".tmp",'w')
+		fh.write('\n'.join(newlines))
 		fh.close()
 		return True
 	else:
@@ -203,13 +265,19 @@ def replace_value_in_file(dict,setings_filename):
 	
 
 def getIntFromUser(message, value=''):
-	""" get an int value from the command line"""
+	""" Prompts a user for an input int. Uses the default value if no
+		value is entered by the user. Uses default value of parse error happens 
+	"""
 	msg2 = ' '.join([message,' (',str(value),') (int): ']) 
-	value = raw_input(msg2)
+	newValue = raw_input(msg2)
+	if(newValue =="" or newValue == "\n"):
+		return int(value)	
+
 	try:
-		return int(value)
+		return int(newValue)
 	except:
-		print "int decoe fail for %s" %value
+		print "int decode fail for " +str(newValue) +" Using default value of" + str(value)
+		return int(value)
 	return None
 
 def getStringFromUser(message,value=''):
@@ -221,11 +289,12 @@ def getStringFromUser(message,value=''):
 def getYesNoFromUser(message,value=''):
 	""" get a yes/no value from the command line"""
 	msg2 = ''.join([message,' (',str(value),') (Y,n): ']) 
-	value = raw_input(msg2)
-	
-	if(value == 'Y' or value == 'Yes' or value == 'y'):
+	newValue = raw_input(msg2)
+	if(newValue =="" or newValue == "\n"):
+		return value
+	if(newValue == 'Y' or newValue == 'Yes' or newValue == 'y'):
 		return True
-	elif(value == 'n' or value == 'no' or value == 'N'):
+	elif(newValue == 'n' or newValue == 'no' or newValue == 'N'):
 		return False
 	return None
 	
