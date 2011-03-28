@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-gitmark.py
+gitmark_add.py
 
-A second version of gitmarks based on gitmarks by Hilary Mason on 2010-09-24.
+Functions and classes to add data to a local gitmarks directory. 
+
+Based on gitmarks by Hilary Mason on 2010-09-24.
 Copyright 2010 by Far McKon (intermediate while picking a opensource license)
 """
 
@@ -27,10 +29,8 @@ USE_SHELL = os.name == 'nt'
 GITMARK_VER_STRING = 'gitmark.alpha.1'
 
 def canHazWebs(): 
-	"""
-	Returns true/false if I can't ping google,
-	which is used as a 'can I reach the internet. test
-	"""
+	""" Returns true/false if I can't ping google,
+	which is used as a 'can I reach the internet?' test """
 	try:
 		h = urllib.urlopen("http://google.com")
 		#todo switch this to a smarter ping system, and use other than google.
@@ -42,9 +42,8 @@ def canHazWebs():
 	return False
 
 def process_gitmarks_cmd(opts, args):
-	""" 
-	processes a gitmarks command opts is list of options. args is 1 or more URL's to process
-	"""
+	""" processes a gitmarks command opts is list of options. 
+	args is 1 or more URL's to process. """
 
 	# -- each arg is a URL. 	
 	for arg in args:
@@ -64,7 +63,8 @@ def process_gitmarks_cmd(opts, args):
 		updateRepoWith(g, doPush)
 		
 def updateRepoWith(gitmarksObj, doPush = True):
-	
+	""" Update a repository with the passed gitmarksObject. This can also be flagged
+	to push that update to the remote repository."""
 	# -- see if we need to add or update the mark
 	if not isInGitmarkPublicRepo(gitmarksObj):		
 		addToRepo(gitmarksObj, doPush)
@@ -74,11 +74,13 @@ def updateRepoWith(gitmarksObj, doPush = True):
 		updateExistingInRepo(gitmarksObj, doPush)
 		
 def updateExistingInRepo(gitmarksObj, doPush = True):
+	""" Updates an existing gitmark file(s) on disk. """
 	if(gitmarksObj.private != True):
 		updateToPublicRepo(gitmarksObj, doPush)
 	updateToPrivateRepo(gitmarksObj, doPush)
 
 def updateToPublicRepo(gitmarksObj, doPush):
+	""" Updates an existing gitmark file(s) in a public repo. """
 	#TODO: set this a pep8 private function name
 	print "HACK: Do we want to push/pull before/after doing this operation?"	
 	# -- TODO: decide if we want to pull before doing this operation,
@@ -87,19 +89,18 @@ def updateToPublicRepo(gitmarksObj, doPush):
 	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
 		settings.BOOKMARK_SUB_PATH, gitmarksObj.hash)
 
-	
 	# -- Check for tags differences
 	oldMark = gitmark.cls_hydrate(filename)
-		# -- add new tags
-		# -- remove old tags
-	# -- check for description differences
-	# -- check for content md5 differences
-		# -- update local content if turned on, and content is different
-		
+		# -- TODO add new tags
+		# -- TODO remove old tags
+	# -- TODO check for description differences
+	# -- TODO check for content md5 differences
+		# -- TODO update local content if turned on, and content is different
 	exit(-3)
+
 def updateToPrivateRepo(gitmarksObj, doPush):
 	#TODO: set this a pep8 private function name
-	print "no such thing to update private repo"
+	print "no such thing to update private repo, encryption not yet installed"
 	exit(-5)
 
 	
@@ -113,9 +114,7 @@ def addToRepo(gitmarksObj, doPush = True):
 		
 def addToPrivateRepo(gitmarksObj, doPush = True):
 	#TODO: set this a pep8 private function name
-	"""
-	add to the public repository
-	"""
+	""" add to the public repository """
 	if(gitmarksObj.private != True):
 		print "this is a public mark. Use 'addToPublicRepo for this"
 		return -1
@@ -123,9 +122,8 @@ def addToPrivateRepo(gitmarksObj, doPush = True):
 			
 def addToPublicRepo(gitmarksObj, doPush = True):
 	#TODO: set this a pep8 private function name
-	"""
-	Adds a gitmark to the local public repository
-	"""
+	""" Adds a gitmark to the local public repository """
+
 	if(gitmarksObj.private != False):
 		print "this is a private mark. Use 'addToPrivateRepo for this"
 		return -1
@@ -195,10 +193,8 @@ def addToPublicRepo(gitmarksObj, doPush = True):
 		
 	
 def isInGitmarkPublicRepo(gitmarkObj):
-	"""
-	Checks if a gitmarks object is already in the public repository
-	by checking for it's' hash in our public bookmarks directory.
-	"""
+	""" Checks if a gitmarks object is already in the public repository
+	by checking for it's' hash in our public bookmarks directory. """
 	if(gitmarkObj.hash == None):
 		return False		
 	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
