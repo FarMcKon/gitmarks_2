@@ -192,7 +192,6 @@ def config_settings_from_user():
 	user_name = getStringFromUser("what username do you want to use?", settings.USER_NAME)
 	user_email = getStringFromUser("what email do you want to use?", settings.USER_EMAIL)
 	machine_name = getStringFromUser("what is the name of this computer?", settings.MACHINE_NAME)
-MACHINE_NAME="Example Computer Name"
 
 
 
@@ -207,7 +206,7 @@ MACHINE_NAME="Example Computer Name"
 	'PRIVATE_GITMARK_REPO_DIR':settings.PRIVATE_GITMARK_REPO_DIR,
 	'CONTENT_GITMARK_DIR':settings.CONTENT_GITMARK_DIR, 'BOOKMARK_SUB_PATH':settings.BOOKMARK_SUB_PATH,
 	'TAG_SUB_PATH':settings.TAG_SUB_PATH, 'MSG_SUB_PATH':settings.MSG_SUB_PATH,
-	'HTML_SUB_PATH':settings.HTML_SUB_PATH
+	'HTML_SUB_PATH':settings.HTML_SUB_PATH,
 	'USER_NAME':user_name,
 	'USER_EMAIL':user_email,
 	'MACHINE_NAME':machine_name
@@ -246,7 +245,11 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
 			val = val.lstrip().rstrip()
 			print '\tupdating var ' + str(var) +' old val ' +str(val) 
 			if var in dict:
-				newline = var + ' = ' + str(dict[var])
+				if type(dict[var]) is str: 
+					newline = var + " = '" + str(dict[var]) + "'"
+				else:
+					newline = var + " = " + str(dict[var])
+
 				if comment:
 					newline += ' # ' + comment
 			print 'updated line "' + newline + '"'
@@ -254,7 +257,8 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
 			print 'no update on "' + newline + '"'
 		newlines.append(newline)
 	if len(newlines) == len(raw_settings):
-		fh = open(settings_filename +".tmp",'w')
+		fh = open(settings_filename,'w')
+		#debugging fh = open(settings_filename +".tmp",'w')
 		fh.write('\n'.join(newlines))
 		fh.close()
 		return True
