@@ -81,7 +81,7 @@ def create_local_gitmarks_folders():
 		abs_public_gitmarks_dir = os.path.abspath(public_gitmarks_dir)
 		# -- create a dir if we need to.
 		if not os.path.isdir(abs_public_gitmarks_dir):	
-			subprocess.call(['mkdir', abs_public_gitmarks_dir], shell=USE_SHELL)
+			os.makedirs(abs_public_gitmarks_dir)
 		# -- init the new git repo in that dir
 		cwd_dir = os.path.abspath(os.getcwd())
 		os.chdir(os.path.abspath(abs_public_gitmarks_dir))
@@ -106,7 +106,7 @@ def create_local_gitmarks_folders():
 		abs_private_gitmarks_dir = os.path.abspath(private_gitmarks_dir)
 		# -- create a dir if we need to.
 		if not os.path.isdir(abs_private_gitmarks_dir):	
-			subprocess.call(['mkdir', abs_private_gitmarks_dir], shell=USE_SHELL)
+			os.makedirs(abs_private_gitmarks_dir)
 		# -- init the new git repo in that dir
 		cwd_dir = os.path.abspath(os.getcwd())
 		os.chdir(os.path.abspath(abs_private_gitmarks_dir))
@@ -118,7 +118,7 @@ def create_local_gitmarks_folders():
 	# -- Create our local content directory and repo, even if we never use it
 	content_dir =  os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR)
 	if not os.path.isdir(content_dir):
-		subprocess.call(['mkdir',content_dir],shell=USE_SHELL)
+		os.makedirs(content_dir)
 	else :
 			print 'content dir already exists at "' + str(content_dir) +'"'
 	cwd_dir = os.path.abspath(os.getcwd())
