@@ -550,7 +550,7 @@ if __name__ == '__main__':
 	parser.add_option("-s", "--share", dest="push", action="store_true", default=False, help="push data to remote gitmarks share point if possible")
 	parser.add_option("-t", "--tags", dest="tags", action="store", default='notag', help="comma seperated list of tags")
 	parser.add_option("-m", "--message", dest="msg", action="store", default=None, help="specify a commit message (default is 'adding [url]')")
-	parser.add_option("-c", "--skipcontent", dest='content', action='store_false', default=True, help="do not try to fetch content to store locall for search")
+	parser.add_option("-c", "--skipcontent", dest='content', action='store_false', default=True, help="do not try to fetch content to store locally for search")
 	parser.add_option("-p", "--private", dest="private", action="store_true", default=False, help="Mark this as a private tag, not to share except with for:XXX recepiants")
 
 	if len(sys.argv) <= 1:
