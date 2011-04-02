@@ -2,6 +2,10 @@
 # encoding: utf-8
 """
 Configuration script for gitmarks.py
+
+This script is a quick setup function for getting basic settings good 
+for running gitmarks
+
 """
 
 import example_settings as settings
