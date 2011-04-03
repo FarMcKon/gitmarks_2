@@ -8,7 +8,7 @@ for running gitmarks
 
 """
 
-import example_settings as settings
+import example_settings
 import os
 import subprocess
 import shutil
@@ -28,24 +28,25 @@ def configure_gitmarks():
 
 	cont = getYesNoFromUser("Store Settings, Setup up local stuff from above settings??",True)
 	if not cont:
-		print" Note: In beta, you must store setting. Can't continue without them"
+		print" Note: In beta, you must store setting. Can't continue without them."
 		print "sorry. Beta and all, you know how it is. Share and Enjoy"
 		return 0
 	
 	# -- store updated settings to settings.py, and reload
 	success = create_or_update_settings(dict,'settings.py', 'example_settings.py')
 	if success :	
-		reload(settings) # TRICKY: we are reloading settings from a ...
-			# file we just created/updated. We do this, because we love danger!
+		# -- well, we got this far. Lets make some folders
+		ret = create_local_gitmarks_folders()
+		if ret:
+			print "We think we just setup your local system. God knows, we may have succeeded!"
+		else:
+			print "Problem creating local gitmarks folders, error code: %d" % (ret)
+			return ret
 	else:
 		print "failed to store updated settings " + str(dict)
 		print " sorry our beta sucks. We are working on it! "
-		return -5
-		
-	# -- well, we got this far. Lets make some folders
-	create_local_gitmarks_folders()
-	print "We think we just setup your local system. God knows, we may have succeeded!"
-
+		return -5;
+	return 0; #just because
 
 def download_needed_software():
 	# wget http://python-gnupg.googlecode.com/files/python-gnupg-0.2.6.tar.gz
@@ -56,12 +57,19 @@ def download_needed_software():
 def create_local_gitmarks_folders():
 	""" This function creates local repository folders. If we have a remote repo name, it will try to sync that data to this place.  If the settings remote repository info is "None" it will just create a local repo without a remote connection"""
 	
+	# Now we can load the settings we just created
+	try:
+		import settings
+	except ImportError, e:
+		print "Failed loading settings.py module"
+		raise e
+	
 	abs_base_dir =  os.path.abspath(settings.GITMARK_BASE_DIR)
 
 	# -- Create a base directory if we need to 
 	if not os.path.isdir(abs_base_dir):
 		print " creating base directory for gitmarks"
-		subprocess.call(['mkdir', abs_base_dir], shell=USE_SHELL)
+		os.makedirs(abs_base_dir)
 
 	public_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
 
@@ -77,7 +85,7 @@ def create_local_gitmarks_folders():
 		abs_public_gitmarks_dir = os.path.abspath(public_gitmarks_dir)
 		# -- create a dir if we need to.
 		if not os.path.isdir(abs_public_gitmarks_dir):	
-			subprocess.call(['mkdir', abs_public_gitmarks_dir], shell=USE_SHELL)
+			os.makedirs(abs_public_gitmarks_dir)
 		# -- init the new git repo in that dir
 		cwd_dir = os.path.abspath(os.getcwd())
 		os.chdir(os.path.abspath(abs_public_gitmarks_dir))
@@ -102,7 +110,7 @@ def create_local_gitmarks_folders():
 		abs_private_gitmarks_dir = os.path.abspath(private_gitmarks_dir)
 		# -- create a dir if we need to.
 		if not os.path.isdir(abs_private_gitmarks_dir):	
-			subprocess.call(['mkdir', abs_private_gitmarks_dir], shell=USE_SHELL)
+			os.makedirs('mkdir')
 		# -- init the new git repo in that dir
 		cwd_dir = os.path.abspath(os.getcwd())
 		os.chdir(os.path.abspath(abs_private_gitmarks_dir))
@@ -114,7 +122,7 @@ def create_local_gitmarks_folders():
 	# -- Create our local content directory and repo, even if we never use it
 	content_dir =  os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR)
 	if not os.path.isdir(content_dir):
-		subprocess.call(['mkdir',content_dir],shell=USE_SHELL)
+		os.makedirs('mkdir')
 	else :
 			print 'content dir already exists at "' + str(content_dir) +'"'
 	cwd_dir = os.path.abspath(os.getcwd())
@@ -122,7 +130,7 @@ def create_local_gitmarks_folders():
 	ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
 	os.chdir(cwd_dir)
 
-	
+	return 0	
 
 	
 def clone_to_local(baseDir, folderName, remoteGitRepo):
@@ -142,7 +150,7 @@ def make_gitmark_subdirs(folderName, subdirsList):
 	for newDir in subdirsList:
 		newDir =  os.path.join(folderName, newDir)
 		newDir = os.path.abspath(newDir)
-		subprocess.call(['mkdir', newDir], shell=USE_SHELL)
+		os.makedirs('mkdir')
 		#TODO: appears git does not add empty dirs. If it did, we would add that here
 	return
 	
@@ -172,30 +180,30 @@ def config_settings_from_user():
 		return None
 
 	base_dir = getStringFromUser('At what base directories do you want your repos?',
-	settings.GITMARK_BASE_DIR)
+	example_settings.GITMARK_BASE_DIR)
 	
-	get_content= getYesNoFromUser('do you want to pull down the content of a page when you download a bookmark?', settings.GET_CONTENT)
+	get_content= getYesNoFromUser('do you want to pull down the content of a page when you download a bookmark?', example_settings.GET_CONTENT)
 	
-	content_cache_mb = getIntFromUser('do you want to set a maximum MB of content cache?', settings.CONTENT_CACHE_SIZE_MB)
+	content_cache_mb = getIntFromUser('do you want to set a maximum MB of content cache?', example_settings.CONTENT_CACHE_SIZE_MB)
 	
-	remote_pub_repo = getStringFromUser('Specify a remote git repository for your public bookmarks',settings.REMOTE_PUBLIC_REPO)
+	remote_pub_repo = getStringFromUser('Specify a remote git repository for your public bookmarks',example_settings.REMOTE_PUBLIC_REPO)
 
-	remote_private_repo = getStringFromUser('Specify a remote git repository for your private bookmarks?',settings.REMOTE_PRIVATE_REPO)
+	remote_private_repo = getStringFromUser('Specify a remote git repository for your private bookmarks?',example_settings.REMOTE_PRIVATE_REPO)
 	
 	remote_content_repo = None
-	content_as_reop= getYesNoFromUser('do you want your content folder to be stored as a repository?',settings.CONTENT_AS_REPO)
+	content_as_reop= getYesNoFromUser('do you want your content folder to be stored as a repository?',example_settings.CONTENT_AS_REPO)
 	
 	if content_as_reop is True:
-		remote_content_repo = getStringFromUser('what is the git repository for your content?', settings.REMOTE_CONTENT_REPO)
+		remote_content_repo = getStringFromUser('what is the git repository for your content?', example_settings.REMOTE_CONTENT_REPO)
 
 	print "-- Pointless Info --"
-	fav_color= getStringFromUser('what is your favorite color?',settings.FAVORITE_COLOR)
-	wv_u_swallow = getStringFromUser('what is the windspeed velocity of an unladen swallow?',settings.UNLADEN_SWALLOW_GUESS)
+	fav_color= getStringFromUser('what is your favorite color?',example_settings.FAVORITE_COLOR)
+	wv_u_swallow = getStringFromUser('what is the windspeed velocity of an unladen swallow?',example_settings.UNLADEN_SWALLOW_GUESS)
 
 	print "-- User Info --"
-	user_name = getStringFromUser("what username do you want to use?", settings.USER_NAME)
-	user_email = getStringFromUser("what email do you want to use?", settings.USER_EMAIL)
-	machine_name = getStringFromUser("what is the name of this computer?", settings.MACHINE_NAME)
+	user_name = getStringFromUser("what username do you want to use?", example_settings.USER_NAME)
+	user_email = getStringFromUser("what email do you want to use?", example_settings.USER_EMAIL)
+	machine_name = getStringFromUser("what is the name of this computer?", example_settings.MACHINE_NAME)
 
 
 
@@ -206,11 +214,11 @@ def config_settings_from_user():
 	'REMOTE_PUBLIC_REPO':remote_pub_repo, 'REMOTE_PRIVATE_REPO': remote_private_repo,
 	'SAVE_CONTENT_TO_REPO':content_as_reop, 'REMOTE_CONTENT_REPO':remote_content_repo,
 	'FAVORITE_COLOR':fav_color, 'UNLADEN_SWALLOW_GUESS':wv_u_swallow,
-	"PUBLIC_GITMARK_REPO_DIR":settings.PUBLIC_GITMARK_REPO_DIR,
-	'PRIVATE_GITMARK_REPO_DIR':settings.PRIVATE_GITMARK_REPO_DIR,
-	'CONTENT_GITMARK_DIR':settings.CONTENT_GITMARK_DIR, 'BOOKMARK_SUB_PATH':settings.BOOKMARK_SUB_PATH,
-	'TAG_SUB_PATH':settings.TAG_SUB_PATH, 'MSG_SUB_PATH':settings.MSG_SUB_PATH,
-	'HTML_SUB_PATH':settings.HTML_SUB_PATH,
+	"PUBLIC_GITMARK_REPO_DIR":example_settings.PUBLIC_GITMARK_REPO_DIR,
+	'PRIVATE_GITMARK_REPO_DIR':example_settings.PRIVATE_GITMARK_REPO_DIR,
+	'CONTENT_GITMARK_DIR':example_settings.CONTENT_GITMARK_DIR, 'BOOKMARK_SUB_PATH':example_settings.BOOKMARK_SUB_PATH,
+	'TAG_SUB_PATH':example_settings.TAG_SUB_PATH, 'MSG_SUB_PATH':example_settings.MSG_SUB_PATH,
+	'HTML_SUB_PATH':example_settings.HTML_SUB_PATH,
 	'USER_NAME':user_name,
 	'USER_EMAIL':user_email,
 	'MACHINE_NAME':machine_name
@@ -308,4 +316,4 @@ def getYesNoFromUser(message,value=''):
 	
 if __name__ == '__main__':
 	""" geneirc main statement"""
-	configure_gitmarks()	
+	configure_gitmarks()
