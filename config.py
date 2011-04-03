@@ -20,6 +20,11 @@ import shutil
 USE_SHELL = os.name == 'nt'
 
 def configure_gitmarks():
+	"""
+	This funcion does the basic configuration of gitmarks. It tries to download 
+	needed software, get settings from users, and spawns the basic on-disk files for
+	the bookmarks.
+	"""
 	# -- pull needed libraries from the net
 	download_needed_software()
 	

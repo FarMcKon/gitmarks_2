@@ -67,4 +67,24 @@ Brass: Filesystem:
 		/posted - encrypted  bookmarks 'sent' from friends (public key if to/from other users)
 	
 	- /content - (optional) local content (scraped pages, stats, info, tags info, etc) (can be synced to git repo type C)
+		
+=====
+Python Code Layout
+=====
+
+The main classes and code are as follows:
+
+	gitmark.py
+		- class gitmark:
+			Class represents a single gitmark and it's stats and metadata.
+		- class gitmarkRepoSyncer: 
+			Calss contains tools for managing remote <-> local repositories 
+			Most of this is automated into  a simple 'fetch, merge, check for changes, push'
+		
+	gitmark_add.py
+		No class, this is a command line file to add gitmarks to the repository.
+	
+	gitmark_friend.py
+		No class, this is a command line file to check for friends updates.
+		
 	
