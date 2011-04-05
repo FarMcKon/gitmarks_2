@@ -2,6 +2,10 @@
 # encoding: utf-8
 """
 Configuration script for gitmarks.py
+
+This script is a quick setup function for getting basic settings good 
+for running gitmarks
+
 """
 
 import example_settings
@@ -16,6 +20,11 @@ import shutil
 USE_SHELL = os.name == 'nt'
 
 def configure_gitmarks():
+	"""
+	This funcion does the basic configuration of gitmarks. It tries to download 
+	needed software, get settings from users, and spawns the basic on-disk files for
+	the bookmarks.
+	"""
 	# -- pull needed libraries from the net
 	download_needed_software()
 	
@@ -24,7 +33,7 @@ def configure_gitmarks():
 
 	cont = getYesNoFromUser("Store Settings, Setup up local stuff from above settings??",True)
 	if not cont:
-		print" Note: In beta, you must store setting. Can't continue without them"
+		print" Note: In beta, you must store setting. Can't continue without them."
 		print "sorry. Beta and all, you know how it is. Share and Enjoy"
 		return 0
 	
@@ -37,12 +46,12 @@ def configure_gitmarks():
 			print "We think we just setup your local system. God knows, we may have succeeded!"
 		else:
 			print "Problem creating local gitmarks folders, error code: %d" % (ret)
+			return ret
 	else:
 		print "failed to store updated settings " + str(dict)
 		print " sorry our beta sucks. We are working on it! "
 		return -5
-		
-
+	return 0 #just because
 
 def download_needed_software():
 	# wget http://python-gnupg.googlecode.com/files/python-gnupg-0.2.6.tar.gz
@@ -120,14 +129,13 @@ def create_local_gitmarks_folders():
 	if not os.path.isdir(content_dir):
 		os.makedirs(content_dir)
 	else :
-			print 'content dir already exists at "' + str(content_dir) +'"'
+		print 'content dir already exists at "' + str(content_dir) +'"'
 	cwd_dir = os.path.abspath(os.getcwd())
 	os.chdir(os.path.abspath(content_dir))
 	ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
 	os.chdir(cwd_dir)
 
 	return 0
-	
 
 	
 def clone_to_local(baseDir, folderName, remoteGitRepo):
@@ -147,7 +155,7 @@ def make_gitmark_subdirs(folderName, subdirsList):
 	for newDir in subdirsList:
 		newDir =  os.path.join(folderName, newDir)
 		newDir = os.path.abspath(newDir)
-		subprocess.call(['mkdir', newDir], shell=USE_SHELL)
+		os.makedirs('mkdir')
 		#TODO: appears git does not add empty dirs. If it did, we would add that here
 	return
 	
@@ -176,7 +184,8 @@ def config_settings_from_user():
 		print "Goodbye! Share and Enjoy."
 		return None
 
-	base_dir = getStringFromUser('At what base directories do you want your repos (relative to current directory)?', example_settings.GITMARK_BASE_DIR)
+	base_dir = getStringFromUser('At what base directories do you want your repos?',
+	example_settings.GITMARK_BASE_DIR)
 	
 	get_content= getYesNoFromUser('do you want to pull down the content of a page when you download a bookmark?', example_settings.GET_CONTENT)
 	
@@ -212,8 +221,7 @@ def config_settings_from_user():
 	'FAVORITE_COLOR':fav_color, 'UNLADEN_SWALLOW_GUESS':wv_u_swallow,
 	"PUBLIC_GITMARK_REPO_DIR":example_settings.PUBLIC_GITMARK_REPO_DIR,
 	'PRIVATE_GITMARK_REPO_DIR':example_settings.PRIVATE_GITMARK_REPO_DIR,
-	'CONTENT_GITMARK_DIR':example_settings.CONTENT_GITMARK_DIR,
-	'BOOKMARK_SUB_PATH':example_settings.BOOKMARK_SUB_PATH,
+	'CONTENT_GITMARK_DIR':example_settings.CONTENT_GITMARK_DIR, 'BOOKMARK_SUB_PATH':example_settings.BOOKMARK_SUB_PATH,
 	'TAG_SUB_PATH':example_settings.TAG_SUB_PATH, 'MSG_SUB_PATH':example_settings.MSG_SUB_PATH,
 	'HTML_SUB_PATH':example_settings.HTML_SUB_PATH,
 	'USER_NAME':user_name,

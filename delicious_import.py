@@ -112,7 +112,7 @@ def import_delicious_to_local_git(username, password='', url=None):
 		addToRepo(newMarksList[0],doPush=False)
 
 # -- hack test main for when yahoo sucks and I need to test
-if __name__ == '__fmain__':
+if __name__ == '__offfline_main__':
 
 
 	x = {    "extended": "", 
@@ -147,7 +147,7 @@ if __name__ == '__fmain__':
 
 if __name__ == '__main__':
  
-	usage =	 "Usage: python delicious_import.py cached-page-uri\nOR\nUsage: python delicious_import.py username password"
+	usage =	 "Usage: python delicious_import.py cached-page-uri\nOR\nUsage: python delicious_import.py username password\n***Password and username are sent as HHTTPS***"
 
 	if( len(sys.argv) == 2): 
 		import getpass

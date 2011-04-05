@@ -1,41 +1,90 @@
 
+====
 Goals:
-To build a distributed bookmark service, which is easy to bookmark, tag, and share web-based information in a robust way, where data is controlled and owned by users.
+====
+1) Build a distributed bookmark service, which is easy to bookmark, tag, and share web-based information in a robust way, where data is controlled and owned by users.
 
-Seconday Goal:
-To build infrasructure for other distributed p2p data sharing systems.
+2) Provide users a local cache of data and metadata on their bookmarked pages, so they 
+can generate/sync/store their own search and usage data
 
-Seconday Goal:
-To build a 'friends bookmarks' search system, whereby it is easy to search friends bookmarks for best search results.
-
-Secret Goal:
-To build infrastructure for a 'Moglen Box'  
+3) To build infrasructure for other distributed p2p data sharing systems to use in the future.  Gitmarks middle-ware will be adapatable to work with sparkleshare, or other systems in the future. 
 
 
-Technology Overview:
+4) To build a 'friends bookmarks' search system, whereby it is easy to search friends bookmarks for best search results.
+
+5) Bonous
+To build infrastructure for Eben Moglen "Freedom Box" style p2p systems
+
+=====
+Rant: 
+=====
+Capitalism is well known to build 2nd rate technology, due to it's desire to 'get it done and get paid' and it's desire to cripple technology to create a revenue stream.  Just For Fun (JFF) and I Need This (INT) projects do nut suffer from those drawbacks. 
+
+In network/internet terms, this amounts to commercal companies developing client-server systems, where peer to peer systems would be more robust, more technically elegant, and more easily scaleable.  The conversion of the internet from Peer to Peer into Client-server (or peer to client to peer) is a technical threat to it's continued robustness and freedom. 
+
+=== 
+Design (Technical) Overview:
+====
+
 Overview is broken down into procelin (UI/user stuff) and brass(plumbing/tools)
 
 Porcelin:
-	A simple web portal that can be run locally 
-	A firefox plugin that can use keyboard shortcuts to save/fetch.
+	A firefox plugin that can use keyboard shortcuts to manage bookmarks (a-la delicious)
+		- Add a bookmark, update a bookmark, flag a bookmark for a friend
+		- Receive bookmarks from friends
+		- Receive notifications when a bookmarked page changes
 	A firefox search plugin/tool 
+		- A plugin to search for phrases or words in pages bookmarked
+		- The ability to search for words or phrases by tag, 
+		- The ability to search for words or phrases in specific friends (or groups)
+			bookmarks
+
 
 Brass:
-	git directory with code/tools for repository
-	git directory of public (world + dog viewable) tags listings and metadata
-	git directory of private(encrypted, pw protected maybe?) tags, status, notifications
-	git directory of local search data (optional) for processing
-	git based service on the web to sync public/private data to/from when offfline
-	json files for each bookmark
-	cache of recent searches, requests, etc for search data or user data
+	directory with code/tools for repository (git dir for developers)
+	git local repo of public tags listings and metadata
+		- when synced to a server, content is (world + dog viewable, friend writable) 
+	git local repo of private tags, status, notifications
+		- when sycned to server, content is (encrypted, pw protected maybe?, friend writable) 
+	git local repo of local search data for processing  (optional, only locally writable) 
+		- json files for each bookmark
+		- cache of recent searches, requests, etc for search data or user data
+	pub/subscriber service on the web to sync public/private data to/from when offfline
+		- TBD
 	
-Brass Filesystem Overview
-	- /tools - directory containing code for duing gitmarks actions (link to other git repo type A)
-	
-	- /public - directory containing gitmark files for each bookarm (links to other git repo type B, world+dog can read)  
-	- /private - directory containing encrypted gitmark files to/from other users. (links to other git repo type C, many can read)  
+
+Brass: Filesystem:
+	- /tools - git local repo containing code for duing gitmarks dev's 
+		(link to other git repo type 'Dev')
+	- /public - local git repo gitmark (links to other git repo type Pub, world+dog can read) 
+		- gitmark file for each bookmark   
 		/tags - stats and tags in private
-		/posted - encrypted or plaintext bookmarks 'sent' from friends
+		/posted - plaintext bookmarks 'sent' from friends
+
+	- /private - local git repo (links to other git repo type Priv)
+		- egitmarks files (encrypted gitmark )
+		/tags - stats and tags in private
+		/posted - encrypted  bookmarks 'sent' from friends (public key if to/from other users)
 	
 	- /content - (optional) local content (scraped pages, stats, info, tags info, etc) (can be synced to git repo type C)
+		
+=====
+Python Code Layout
+=====
+
+The main classes and code are as follows:
+
+	gitmark.py
+		- class gitmark:
+			Class represents a single gitmark and it's stats and metadata.
+		- class gitmarkRepoSyncer: 
+			Calss contains tools for managing remote <-> local repositories 
+			Most of this is automated into  a simple 'fetch, merge, check for changes, push'
+		
+	gitmark_add.py
+		No class, this is a command line file to add gitmarks to the repository.
+	
+	gitmark_friend.py
+		No class, this is a command line file to check for friends updates.
+		
 	
