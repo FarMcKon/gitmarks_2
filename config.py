@@ -77,7 +77,7 @@ def create_local_gitmarks_folders():
         print "Failed loading settings.py module"
         raise e
 
-    abs_base_dir =  os.path.abspath(settings.GITMARK_BASE_DIR)
+    abs_base_dir = os.path.abspath(settings.GITMARK_BASE_DIR)
 
     # -- Create a base directory if we need to
     if not os.path.isdir(abs_base_dir):
@@ -108,7 +108,7 @@ def create_local_gitmarks_folders():
         # -- init the new git repo in that dir
         cwd_dir = os.path.abspath(os.getcwd())
         os.chdir(os.path.abspath(abs_public_gitmarks_dir))
-        ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
+        ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
         os.chdir(cwd_dir)
 
         # -- create our sub-dirs if needed
@@ -141,7 +141,7 @@ def create_local_gitmarks_folders():
         # -- init the new git repo in that dir
         cwd_dir = os.path.abspath(os.getcwd())
         os.chdir(os.path.abspath(abs_private_gitmarks_dir))
-        ret =  subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
+        ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
         os.chdir(cwd_dir)
 
         # -- create our sub-dirs if needed
@@ -151,12 +151,12 @@ def create_local_gitmarks_folders():
                                 settings.MSG_SUB_PATH])
 
     # -- Create our local content directory and repo, even if we never use it
-    content_dir =  os.path.join(settings.GITMARK_BASE_DIR,
+    content_dir = os.path.join(settings.GITMARK_BASE_DIR,
                                 settings.CONTENT_GITMARK_DIR)
     if not os.path.isdir(content_dir):
         os.makedirs(content_dir)
     else:
-        print 'content dir already exists at "' + str(content_dir) +'"'
+        print 'content dir already exists at "' + str(content_dir) + '"'
 
     cwd_dir = os.path.abspath(os.getcwd())
     os.chdir(os.path.abspath(content_dir))
@@ -174,7 +174,7 @@ def clone_to_local(baseDir, folderName, remoteGitRepo):
     baseDir = os.path.abspath(baseDir)
     cwd_dir = os.path.abspath(os.getcwd())
     os.chdir(os.path.abspath(baseDir))
-    ret =  subprocess.call(['git', 'clone', remoteGitRepo, folderName],
+    ret = subprocess.call(['git', 'clone', remoteGitRepo, folderName],
                             shell=USE_SHELL)
     os.chdir(cwd_dir)
     return ret
@@ -183,7 +183,7 @@ def clone_to_local(baseDir, folderName, remoteGitRepo):
 def make_gitmark_subdirs(folderName, subdirsList):
     """ makes a stack of gitmarks subdirectories at the folder listed """
     for newDir in subdirsList:
-        newDir =  os.path.join(folderName, newDir)
+        newDir = os.path.join(folderName, newDir)
         newDir = os.path.abspath(newDir)
         os.makedirs('mkdir')
         #TODO: appears git does not add empty dirs. If it did, we would add
@@ -222,7 +222,7 @@ def config_settings_from_user():
     base_dir = getStringFromUser('What base directories do you want your ' + \
                     'repos?', example_settings.GITMARK_BASE_DIR)
 
-    get_content= getYesNoFromUser('Do you want to pull down content of ' + \
+    get_content = getYesNoFromUser('Do you want to pull down content of ' + \
                     'page when you download a bookmark?',
                     example_settings.GET_CONTENT)
 
@@ -239,7 +239,7 @@ def config_settings_from_user():
                         example_settings.REMOTE_PRIVATE_REPO)
 
     remote_content_repo = None
-    content_as_reop= getYesNoFromUser('Do you want your content folder ' + \
+    content_as_reop = getYesNoFromUser('Do you want your content folder ' + \
                         'to be stored as a repository?',
                         example_settings.CONTENT_AS_REPO)
 
@@ -249,7 +249,7 @@ def config_settings_from_user():
                                 example_settings.REMOTE_CONTENT_REPO)
 
     print "-- Pointless Info --"
-    fav_color= getStringFromUser('What is your favorite color?',
+    fav_color = getStringFromUser('What is your favorite color?',
                     example_settings.FAVORITE_COLOR)
     wv_u_swallow = getStringFromUser('What is the windspeed velocity of ' + \
                     'an unladen swallow?',
@@ -263,29 +263,28 @@ def config_settings_from_user():
     machine_name = getStringFromUser("What is the name of this computer?",
                     example_settings.MACHINE_NAME)
 
-    dict = { 'GITMARK_BASE_DIR':base_dir, 'GET_CONTENT':get_content,
-    'CONTENT_CACHE_SIZE_MB':content_cache_mb,
-    'CONTENT_AS_REPO':content_as_reop,
-    'REMOTE_PUBLIC_REPO':remote_pub_repo,
+    dict = {'GITMARK_BASE_DIR': base_dir, 'GET_CONTENT': get_content,
+    'CONTENT_CACHE_SIZE_MB': content_cache_mb,
+    'CONTENT_AS_REPO': content_as_reop,
+    'REMOTE_PUBLIC_REPO': remote_pub_repo,
     'REMOTE_PRIVATE_REPO': remote_private_repo,
-    'SAVE_CONTENT_TO_REPO':content_as_reop,
-    'REMOTE_CONTENT_REPO':remote_content_repo,
-    'FAVORITE_COLOR':fav_color, 'UNLADEN_SWALLOW_GUESS':wv_u_swallow,
-    "PUBLIC_GITMARK_REPO_DIR":example_settings.PUBLIC_GITMARK_REPO_DIR,
-    'PRIVATE_GITMARK_REPO_DIR':example_settings.PRIVATE_GITMARK_REPO_DIR,
-    'CONTENT_GITMARK_DIR':example_settings.CONTENT_GITMARK_DIR,
-    'BOOKMARK_SUB_PATH':example_settings.BOOKMARK_SUB_PATH,
-    'TAG_SUB_PATH':example_settings.TAG_SUB_PATH,
-    'MSG_SUB_PATH':example_settings.MSG_SUB_PATH,
-    'HTML_SUB_PATH':example_settings.HTML_SUB_PATH,
-    'USER_NAME':user_name,
-    'USER_EMAIL':user_email,
-    'MACHINE_NAME':machine_name
-    }
+    'SAVE_CONTENT_TO_REPO': content_as_reop,
+    'REMOTE_CONTENT_REPO': remote_content_repo,
+    'FAVORITE_COLOR': fav_color, 'UNLADEN_SWALLOW_GUESS': wv_u_swallow,
+    "PUBLIC_GITMARK_REPO_DIR": example_settings.PUBLIC_GITMARK_REPO_DIR,
+    'PRIVATE_GITMARK_REPO_DIR': example_settings.PRIVATE_GITMARK_REPO_DIR,
+    'CONTENT_GITMARK_DIR': example_settings.CONTENT_GITMARK_DIR,
+    'BOOKMARK_SUB_PATH': example_settings.BOOKMARK_SUB_PATH,
+    'TAG_SUB_PATH': example_settings.TAG_SUB_PATH,
+    'MSG_SUB_PATH': example_settings.MSG_SUB_PATH,
+    'HTML_SUB_PATH': example_settings.HTML_SUB_PATH,
+    'USER_NAME': user_name,
+    'USER_EMAIL': user_email,
+    'MACHINE_NAME': machine_name}
     return dict
 
 
-def create_or_update_settings(dict,settings_filename, opt_example_file=None):
+def create_or_update_settings(dict, settings_filename, opt_example_file=None):
     """
     Does some magic to read a settings file, and replace the values in-line,
     and then write the new values back to the settings file.
@@ -293,10 +292,11 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
     if not (os.path.isfile(settings_filename)):
         if not (opt_example_file):
             print "No settings files, add example_settings.py or settings.py"
-            exit(-10); #FAIL
+            exit(-10)
+
         shutil.copy(opt_example_file, settings_filename)
 
-    fh = open(settings_filename,'r')
+    fh = open(settings_filename, 'r')
     raw_settings = fh.readlines()
     fh.close()
     newlines = []
@@ -311,7 +311,7 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
 
             print 'on line "' + newline + '"'
 
-            if( line.split('#') < 1 ):
+            if (line.split('#') < 1):
                 comment = line.split('#')[-1]
                 print '\thas comment ' + str(comment)
 
@@ -320,7 +320,7 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
             var = var.lstrip().rstrip()
             val = val.lstrip().rstrip()
 
-            print '\tupdating var ' + str(var) +' old val ' +str(val)
+            print '\tupdating var ' + str(var) + ' old val ' + str(val)
 
             if var in dict:
                 if type(dict[var]) is str:
@@ -339,7 +339,7 @@ def create_or_update_settings(dict,settings_filename, opt_example_file=None):
         newlines.append(newline)
 
     if len(newlines) == len(raw_settings):
-        fh = open(settings_filename,'w')
+        fh = open(settings_filename, 'w')
         #debugging fh = open(settings_filename +".tmp",'w')
         fh.write('\n'.join(newlines))
         fh.close()
@@ -356,9 +356,9 @@ def getIntFromUser(message, value=''):
     Prompts a user for an input int. Uses the default value if no
     value is entered by the user. Uses default value of parse error happens
     """
-    msg2 = ' '.join([message,' (',str(value),') (int): '])
+    msg2 = ' '.join([message, ' (', str(value), ') (int): '])
     newValue = raw_input(msg2)
-    if(newValue =="" or newValue == "\n"):
+    if(newValue == "" or newValue == "\n"):
         return int(value)
 
     try:
@@ -371,19 +371,19 @@ def getIntFromUser(message, value=''):
     return None
 
 
-def getStringFromUser(message,value=''):
+def getStringFromUser(message, value=''):
     """get a string value from the command line"""
-    msg2 = ''.join([message,' (',str(value),') (string): '])
+    msg2 = ''.join([message, ' (', str(value), ') (string): '])
     value = raw_input(msg2)
     return value
 
 
-def getYesNoFromUser(message,value=''):
+def getYesNoFromUser(message, value=''):
     """ get a yes/no value from the command line"""
-    msg2 = ''.join([message,' (',str(value),') (Y,n): '])
+    msg2 = ''.join([message, ' (', str(value), ') (Y,n): '])
     newValue = raw_input(msg2)
 
-    if(newValue =="" or newValue == "\n"):
+    if(newValue == "" or newValue == "\n"):
         return value
 
     if(newValue == 'Y' or newValue == 'Yes' or newValue == 'y'):
