@@ -87,7 +87,7 @@ def create_local_gitmarks_folders():
     public_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
                                         settings.PUBLIC_GITMARK_REPO_DIR)
 
-    # -- if we have a remote public repo, try to git-clone to create a local copy.
+    # -- if we have remote public repo, try to git-clone to create local copy.
     if(settings.REMOTE_PUBLIC_REPO != None):
         if not folder_is_git_repo(public_gitmarks_dir):
             ret = clone_to_local(settings.GITMARK_BASE_DIR,
@@ -120,7 +120,7 @@ def create_local_gitmarks_folders():
     private_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
                                         settings.PRIVATE_GITMARK_REPO_DIR)
 
-    # -- if we have a remote private repo, try to git-clone to create a local copy.
+    # -- if we have remote private repo, try to git-clone to create local copy.
     if(settings.REMOTE_PRIVATE_REPO != None):
         if not folder_is_git_repo(private_gitmarks_dir):
             ret = clone_to_local(settings.GITMARK_BASE_DIR,
