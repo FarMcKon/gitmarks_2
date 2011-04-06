@@ -3,7 +3,7 @@
 """
 Configuration script for gitmarks.py
 
-This script is a quick setup function for getting basic settings good 
+This script is a quick setup function for getting basic settings good
 for running gitmarks
 """
 
@@ -18,11 +18,12 @@ import shutil
 # send git commands through the shell on Windows, and directly everywhere else.
 USE_SHELL = os.name == 'nt'
 
+
 def configure_gitmarks():
     """
-    This function does the basic configuration of gitmarks. It tries to download
-    needed software, get settings from users, and spawns the basic on-disk
-    files for the bookmarks.
+    This function does the basic configuration of gitmarks. It tries to
+    download needed software, get settings from users, and spawns the basic
+    on-disk files for the bookmarks.
     """
     # -- pull needed libraries from the net
     download_needed_software()
@@ -53,18 +54,20 @@ def configure_gitmarks():
 
     return 0
 
+
 def download_needed_software():
     # wget http://python-gnupg.googlecode.com/files/python-gnupg-0.2.6.tar.gz
     # or get gpg or pgp instead?
     print "TODO: Download prerequsite software"
     pass
 
+
 def create_local_gitmarks_folders():
     """
     This function creates local repository folders. If we have a remote
     repo name, it will try to sync that data to this place.  If the settings
     remote repository info is "None" it will just create a local repo without a
-    remote connection
+    remote connection.
     """
 
     # Now we can load the settings we just created
@@ -76,7 +79,7 @@ def create_local_gitmarks_folders():
 
     abs_base_dir =  os.path.abspath(settings.GITMARK_BASE_DIR)
 
-    # -- Create a base directory if we need to 
+    # -- Create a base directory if we need to
     if not os.path.isdir(abs_base_dir):
         print " creating base directory for gitmarks"
         os.makedirs(abs_base_dir)
@@ -162,6 +165,7 @@ def create_local_gitmarks_folders():
 
     return 0
 
+
 def clone_to_local(baseDir, folderName, remoteGitRepo):
     """Clones a repository at remoteGitRepo to a local directory"""
     print "cloning repository %s to directory %s" % (remoteGitRepo, folderName)
@@ -175,6 +179,7 @@ def clone_to_local(baseDir, folderName, remoteGitRepo):
     os.chdir(cwd_dir)
     return ret
 
+
 def make_gitmark_subdirs(folderName, subdirsList):
     """ makes a stack of gitmarks subdirectories at the folder listed """
     for newDir in subdirsList:
@@ -185,9 +190,11 @@ def make_gitmark_subdirs(folderName, subdirsList):
         #      that here
     return
 
+
 def folder_is_git_repo(folderName):
     git_folder = os.path.join(folderName, '/.git/')
     return os.path.isdir(git_folder)
+
 
 def config_settings_from_user():
     """
@@ -277,6 +284,7 @@ def config_settings_from_user():
     }
     return dict
 
+
 def create_or_update_settings(dict,settings_filename, opt_example_file=None):
     """
     Does some magic to read a settings file, and replace the values in-line,
@@ -362,11 +370,13 @@ def getIntFromUser(message, value=''):
 
     return None
 
+
 def getStringFromUser(message,value=''):
     """get a string value from the command line"""
     msg2 = ''.join([message,' (',str(value),') (string): '])
     value = raw_input(msg2)
     return value
+
 
 def getYesNoFromUser(message,value=''):
     """ get a yes/no value from the command line"""
@@ -383,6 +393,7 @@ def getYesNoFromUser(message,value=''):
         return False
 
     return None
+
 
 if __name__ == '__main__':
     """ geneirc main statement"""
