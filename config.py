@@ -35,8 +35,8 @@ def configure_gitmarks():
     download_needed_software()
 
     # Generate our configuration settings
-    dict = config_settings_from_user()
-    if dict is None:
+    user_settings = config_settings_from_user()
+    if user_settings is None:
         return 0
 
     try:
@@ -52,7 +52,8 @@ def configure_gitmarks():
 
     # Store user settings in settings.py, use example_settings.py as starting
     # point
-    create_or_update_settings(dict, 'settings.py', 'example_settings.py')
+    create_or_update_settings(user_settings, 'settings.py',
+                              'example_settings.py')
 
     create_local_gitmarks_folders()
 
@@ -283,23 +284,25 @@ def config_settings_from_user():
     return dict
 
 
-def create_or_update_settings(dict, settings_filename, opt_example_file=None):
+def create_or_update_settings(user_settings, settings_filename,
+                              opt_example_file=None):
     """
-    Does some magic to read a settings file, and replace the values in-line,
-    and then write the new values back to the settings file.
+    Default all settings to the ones in the example settings file (if exists)
+    and overwrite defaults with setting from user
     """
 
-    if not (os.path.isfile(settings_filename)):
-        if not (opt_example_file):
-            raise SettingsError("Add example_settings.py or settings.py")
+    if not os.path.isfile(settings_filename) and not opt_example_file:
+        raise SettingsError("Add example_settings.py or settings.py")
 
-        shutil.copy(opt_example_file, settings_filename)
+    # Default all user settings to example settings file if one is given
+    shutil.copy(opt_example_file, settings_filename)
 
     fh = open(settings_filename, 'r')
     raw_settings = fh.readlines()
     fh.close()
     newlines = []
 
+    # Parse lines of settings file
     for line in raw_settings:
         newline = line.rstrip()
 
@@ -307,8 +310,6 @@ def create_or_update_settings(dict, settings_filename, opt_example_file=None):
             comment = None
             val = None
             var = None
-
-            print 'on line "' + newline + '"'
 
             if (line.split('#') < 1):
                 comment = line.split('#')[-1]
@@ -321,11 +322,11 @@ def create_or_update_settings(dict, settings_filename, opt_example_file=None):
 
             print '\tupdating var ' + str(var) + ' old val ' + str(val)
 
-            if var in dict:
-                if type(dict[var]) is str:
-                    newline = var + " = '" + str(dict[var]) + "'"
+            if var in user_settings:
+                if type(user_settings[var]) is str:
+                    newline = var + " = '" + str(user_settings[var]) + "'"
                 else:
-                    newline = var + " = " + str(dict[var])
+                    newline = var + " = " + str(user_settings[var])
 
                 if comment:
                     newline += ' # ' + comment
