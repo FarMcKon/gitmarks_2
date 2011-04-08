@@ -106,7 +106,7 @@ def create_local_gitmarks_folders():
 
     # -- Create a base directory if we need to
     if not os.path.isdir(abs_base_dir):
-        print " creating base directory for gitmarks"
+        print "Creating base directory, '%s', for gitmarks" % (abs_base_dir)
         os.makedirs(abs_base_dir)
 
     public_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
@@ -179,7 +179,7 @@ def create_local_gitmarks_folders():
     if not os.path.isdir(content_dir):
         os.makedirs(content_dir)
     else:
-        print 'content dir already exists at "' + str(content_dir) + '"'
+        print "Content directory, '%s', already exists" % (content_dir)
 
     cwd_dir = os.path.abspath(os.getcwd())
     os.chdir(os.path.abspath(content_dir))
@@ -189,7 +189,9 @@ def create_local_gitmarks_folders():
 
 def clone_to_local(baseDir, folderName, remoteGitRepo):
     """Clones a repository at remoteGitRepo to a local directory"""
-    print "cloning repository %s to directory %s" % (remoteGitRepo, folderName)
+
+    print "Cloning repository '%s' to directory '%s'" % (remoteGitRepo,
+                                                        folderName)
 
     #swizzle our process location so that we get added to the right repo
     baseDir = os.path.abspath(baseDir)
@@ -221,7 +223,7 @@ def config_settings_from_user():
     """Returns dict of config settings set interactivly by user"""
 
     base_dir = get_string_from_user('What base directories do you want ' + \
-                    'your repos?', example_settings.GITMARK_BASE_DIR)
+                    'for your repos?', example_settings.GITMARK_BASE_DIR)
 
     get_content = getYesNoFromUser('Do you want to pull down content of ' + \
                     'page when you download a bookmark?',
@@ -257,24 +259,26 @@ def config_settings_from_user():
     machine_name = get_string_from_user("What is the name of this computer?",
                     example_settings.MACHINE_NAME)
 
-    dict = {'GITMARK_BASE_DIR': base_dir, 'GET_CONTENT': get_content,
-    'CONTENT_CACHE_SIZE_MB': content_cache_mb,
-    'CONTENT_AS_REPO': content_as_reop,
-    'REMOTE_PUBLIC_REPO': remote_pub_repo,
-    'REMOTE_PRIVATE_REPO': remote_private_repo,
-    'SAVE_CONTENT_TO_REPO': content_as_reop,
-    'REMOTE_CONTENT_REPO': remote_content_repo,
-    "PUBLIC_GITMARK_REPO_DIR": example_settings.PUBLIC_GITMARK_REPO_DIR,
-    'PRIVATE_GITMARK_REPO_DIR': example_settings.PRIVATE_GITMARK_REPO_DIR,
-    'CONTENT_GITMARK_DIR': example_settings.CONTENT_GITMARK_DIR,
-    'BOOKMARK_SUB_PATH': example_settings.BOOKMARK_SUB_PATH,
-    'TAG_SUB_PATH': example_settings.TAG_SUB_PATH,
-    'MSG_SUB_PATH': example_settings.MSG_SUB_PATH,
-    'HTML_SUB_PATH': example_settings.HTML_SUB_PATH,
-    'USER_NAME': user_name,
-    'USER_EMAIL': user_email,
-    'MACHINE_NAME': machine_name}
-    return dict
+    return {'GITMARK_BASE_DIR': base_dir,
+            'GET_CONTENT': get_content,
+            'CONTENT_CACHE_SIZE_MB': content_cache_mb,
+            'CONTENT_AS_REPO': content_as_reop,
+            'REMOTE_PUBLIC_REPO': remote_pub_repo,
+            'REMOTE_PRIVATE_REPO': remote_private_repo,
+            'SAVE_CONTENT_TO_REPO': content_as_reop,
+            'REMOTE_CONTENT_REPO': remote_content_repo,
+            'PUBLIC_GITMARK_REPO_DIR':
+                example_settings.PUBLIC_GITMARK_REPO_DIR,
+            'PRIVATE_GITMARK_REPO_DIR':
+                example_settings.PRIVATE_GITMARK_REPO_DIR,
+            'CONTENT_GITMARK_DIR': example_settings.CONTENT_GITMARK_DIR,
+            'BOOKMARK_SUB_PATH': example_settings.BOOKMARK_SUB_PATH,
+            'TAG_SUB_PATH': example_settings.TAG_SUB_PATH,
+            'MSG_SUB_PATH': example_settings.MSG_SUB_PATH,
+            'HTML_SUB_PATH': example_settings.HTML_SUB_PATH,
+            'USER_NAME': user_name,
+            'USER_EMAIL': user_email,
+            'MACHINE_NAME': machine_name}
 
 
 def create_or_update_settings(user_settings, settings_filename,
