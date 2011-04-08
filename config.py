@@ -220,22 +220,22 @@ def folder_is_git_repo(folderName):
 def config_settings_from_user():
     """Returns dict of config settings set interactivly by user"""
 
-    base_dir = getStringFromUser('What base directories do you want your ' + \
-                    'repos?', example_settings.GITMARK_BASE_DIR)
+    base_dir = get_string_from_user('What base directories do you want ' + \
+                    'your repos?', example_settings.GITMARK_BASE_DIR)
 
     get_content = getYesNoFromUser('Do you want to pull down content of ' + \
                     'page when you download a bookmark?',
                     example_settings.GET_CONTENT)
 
-    content_cache_mb = getIntFromUser('Do you want to set a maximum MB of ' + \
-                    'content cache?',
+    content_cache_mb = get_int_from_user('Do you want to set a maximum MB ' + \
+                    'of content cache?',
                     example_settings.CONTENT_CACHE_SIZE_MB)
 
-    remote_pub_repo = getStringFromUser('Specify remote git repository ' + \
+    remote_pub_repo = get_string_from_user('Specify remote git repository ' + \
                         'for your public bookmarks',
                         example_settings.REMOTE_PUBLIC_REPO)
 
-    remote_private_repo = getStringFromUser('Specify remote git ' + \
+    remote_private_repo = get_string_from_user('Specify remote git ' + \
                         'repository for your private bookmarks?',
                         example_settings.REMOTE_PRIVATE_REPO)
 
@@ -245,16 +245,16 @@ def config_settings_from_user():
                         example_settings.CONTENT_AS_REPO)
 
     if content_as_reop is True:
-        remote_content_repo = getStringFromUser('What is  git repository ' + \
-                                'for your content?',
+        remote_content_repo = get_string_from_user('What is git ' + \
+                                'repository for your content?',
                                 example_settings.REMOTE_CONTENT_REPO)
 
     print "-- User Info --"
-    user_name = getStringFromUser("What username do you want to use?",
+    user_name = get_string_from_user("What username do you want to use?",
                     example_settings.USER_NAME)
-    user_email = getStringFromUser("What email do you want to use?",
+    user_email = get_string_from_user("What email do you want to use?",
                     example_settings.USER_EMAIL)
-    machine_name = getStringFromUser("What is the name of this computer?",
+    machine_name = get_string_from_user("What is the name of this computer?",
                     example_settings.MACHINE_NAME)
 
     dict = {'GITMARK_BASE_DIR': base_dir, 'GET_CONTENT': get_content,
@@ -332,7 +332,7 @@ def create_or_update_settings(user_settings, settings_filename,
         raise SettingsError("Settings size did not match")
 
 
-def getIntFromUser(message, value=''):
+def get_int_from_user(message, value=''):
     """
     Prompts a user for an input int. Uses the default value if no
     value is entered by the user. Uses default value of parse error happens
@@ -352,7 +352,7 @@ def getIntFromUser(message, value=''):
     return None
 
 
-def getStringFromUser(message, value=''):
+def get_string_from_user(message, value=''):
     """get a string value from the command line"""
     msg2 = ''.join([message, ' (', str(value), ') (string): '])
     value = raw_input(msg2)
