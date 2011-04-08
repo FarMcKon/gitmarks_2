@@ -24,6 +24,25 @@ from gitmarks_exceptions import InputError, SettingsError, GitError
 USE_SHELL = os.name == 'nt'
 
 
+def main():
+    """Main"""
+
+    print """
+        Wecome to gitmarks configurator. This will setup a couple of local
+        repositories for you to use as yor gitmarks system.  Gitmarks will
+        maintain 2-3 repositories.
+         - 1 for public use (world+dog read)
+         - 1 for friends use (with some encryption)
+         - 1 (optional) for content. This can be non-repo, or nonexistant
+    """
+
+    if not getYesNoFromUser("Ready to start?"):
+        print "Goodbye! Share and Enjoy."
+        return 0
+
+    return configure_gitmarks()
+
+
 def configure_gitmarks():
     """
     This function does the basic configuration of gitmarks. It tries to
@@ -36,8 +55,6 @@ def configure_gitmarks():
 
     # Generate our configuration settings
     user_settings = config_settings_from_user()
-    if user_settings is None:
-        return 0
 
     try:
         cont = getYesNoFromUser("Setup up local environment from above " + \
@@ -201,23 +218,7 @@ def folder_is_git_repo(folderName):
 
 
 def config_settings_from_user():
-    """
-    Returns dict of config settings set interactivly by user.
-        - Returns none on error
-    """
-
-    print """
-        Wecome to gitmarks configurator. This will setup a couple of local
-        repositories for you to use as yor gitmarks system.  Gitmarks will
-        maintain 2-3 repositories.
-         - 1 for public use (world+dog read)
-         - 1 for friends use (with some encryption)
-         - 1 (optional) for content. This can be non-repo, or nonexistant
-    """
-    ret = getYesNoFromUser("Ready to start?")
-    if ret is False:
-        print "Goodbye! Share and Enjoy."
-        return None
+    """Returns dict of config settings set interactivly by user"""
 
     base_dir = getStringFromUser('What base directories do you want your ' + \
                     'repos?', example_settings.GITMARK_BASE_DIR)
@@ -377,4 +378,4 @@ def getYesNoFromUser(message, value=True):
 
 if __name__ == '__main__':
     """Start"""
-    sys.exit(configure_gitmarks())
+    sys.exit(main())
