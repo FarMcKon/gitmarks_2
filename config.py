@@ -313,9 +313,9 @@ def create_or_update_settings(user_settings, settings_filename,
             newlines.append(line)
             continue
 
-        # File is key=value format
+        # File is key=value format, but just need the key to see if the user
+        # specified it
         var = line.split('=')[0].lstrip().rstrip()
-        val = ''.join(line.split('=')[1:]).lstrip().rstrip()
 
         # Overwrite default setting if user specified it otherwise just write
         # default one
