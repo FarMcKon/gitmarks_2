@@ -215,6 +215,7 @@ def make_gitmark_subdirs(folder_name, subdirs_list):
 
 
 def folder_is_git_repo(folder_name):
+    """Determine if a given folder is a valid git repository"""
     git_folder = os.path.join(folder_name, '/.git/')
     return os.path.isdir(git_folder)
 
@@ -349,12 +350,9 @@ def get_int_from_user(message, value=''):
 
     try:
         return int(new_value)
-    except:
-        print "int decode fail for " + str(new_value) + \
-                " Using default value of" + str(value)
+    except ValueError:
+        print "Invalid integer, '%s', using default value" % (str(new_value))
         return int(value)
-
-    return None
 
 
 def get_string_from_user(message, value=''):
@@ -382,5 +380,4 @@ def get_yes_or_no_from_user(message, value=True):
     raise InputError("Please choose y/n")
 
 if __name__ == '__main__':
-    """Start"""
     sys.exit(main())
