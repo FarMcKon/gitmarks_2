@@ -8,9 +8,14 @@ for running gitmarks
 """
 
 import example_settings
+
+import sys
 import os
 import subprocess
 import shutil
+
+from gitmarks_exceptions import InputError, SettingsError, GitError
+
 
 # Arguments are passed directly to git, not through the shell, to avoid the
 # need for shell escaping. On Windows, however, commands need to go through the
@@ -25,40 +30,40 @@ def configure_gitmarks():
     download needed software, get settings from users, and spawns the basic
     on-disk files for the bookmarks.
     """
-    # -- pull needed libraries from the net
+
+    # Pull needed libraries from Internet
     download_needed_software()
 
-    # -- generate our configuration settings
+    # Generate our configuration settings
     dict = config_settings_from_user()
-
-    cont = getYesNoFromUser("Setup up local environment from above settings?",
-                            True)
-    if not cont:
-        print "You must store settings in beta, can't continue without them."
+    if dict is None:
         return 0
 
-    # -- store updated settings to settings.py, and reload
-    success = create_or_update_settings(dict, 'settings.py',
-                                        'example_settings.py')
-    if success:
-        # -- well, we got this far. Lets make some folders
-        ret = create_local_gitmarks_folders()
-        if ret:
-            print "Setup complete."
-        else:
-            print "Problem creating local gitmarks folders, error: %d" % (ret)
-            return ret
-    else:
-        print "Failed to store updated settings " + str(dict)
-        return -5
+    try:
+        cont = getYesNoFromUser("Setup up local environment from above " + \
+                                "settings?")
+    except InputError, e:
+        print str(e)
+        return -1
 
+    if not cont:
+        print "You must store settings in beta, can't continue without them."
+        return -1
+
+    # Store user settings in settings.py, use example_settings.py as starting
+    # point
+    create_or_update_settings(dict, 'settings.py', 'example_settings.py')
+
+    create_local_gitmarks_folders()
+
+    print "Setup complete."
     return 0
 
 
 def download_needed_software():
+    """Not implemented"""
     # wget http://python-gnupg.googlecode.com/files/python-gnupg-0.2.6.tar.gz
     # or get gpg or pgp instead?
-    print "TODO: Download prerequsite software"
     pass
 
 
@@ -68,6 +73,8 @@ def create_local_gitmarks_folders():
     repo name, it will try to sync that data to this place.  If the settings
     remote repository info is "None" it will just create a local repo without a
     remote connection.
+        - Raises GitError if problems cloning local repos
+        - Raises ImportError if unable to import settings.py
     """
 
     # Now we can load the settings we just created
@@ -94,8 +101,7 @@ def create_local_gitmarks_folders():
                                     public_gitmarks_dir,
                                     settings.REMOTE_PUBLIC_REPO)
             if(ret != 0):
-                print "remote public clone to local failed"
-                return -9
+                raise GitError("Remote public clone to local failed")
 
     # -- no remote public repo, make a dir and git-init it as needed
     else:
@@ -127,8 +133,7 @@ def create_local_gitmarks_folders():
                                     private_gitmarks_dir,
                                     settings.REMOTE_PRIVATE_REPO)
             if(ret != 0):
-                print "remote public clone to local failed"
-                return -9
+                raise GitError("remote public clone to local failed")
 
     # -- no remote private repo, make a dir and git-init it as needed
     else:
@@ -162,8 +167,6 @@ def create_local_gitmarks_folders():
     os.chdir(os.path.abspath(content_dir))
     ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
     os.chdir(cwd_dir)
-
-    return 0
 
 
 def clone_to_local(baseDir, folderName, remoteGitRepo):
@@ -210,12 +213,8 @@ def config_settings_from_user():
          - 1 for friends use (with some encryption)
          - 1 (optional) for content. This can be non-repo, or nonexistant
     """
-    ret = getYesNoFromUser("Ready to start?", True)
-    if ret is None:
-        print "invalid choice"
-        return None
-
-    elif ret is False:
+    ret = getYesNoFromUser("Ready to start?")
+    if ret is False:
         print "Goodbye! Share and Enjoy."
         return None
 
@@ -289,10 +288,10 @@ def create_or_update_settings(dict, settings_filename, opt_example_file=None):
     Does some magic to read a settings file, and replace the values in-line,
     and then write the new values back to the settings file.
     """
+
     if not (os.path.isfile(settings_filename)):
         if not (opt_example_file):
-            print "No settings files, add example_settings.py or settings.py"
-            exit(-10)
+            raise SettingsError("Add example_settings.py or settings.py")
 
         shutil.copy(opt_example_file, settings_filename)
 
@@ -340,15 +339,10 @@ def create_or_update_settings(dict, settings_filename, opt_example_file=None):
 
     if len(newlines) == len(raw_settings):
         fh = open(settings_filename, 'w')
-        #debugging fh = open(settings_filename +".tmp",'w')
         fh.write('\n'.join(newlines))
         fh.close()
-        return True
     else:
-        print "settings size did not match! Abandon the ship!"
-        return False
-
-    return False
+        raise SettingsError("settings size did not match")
 
 
 def getIntFromUser(message, value=''):
@@ -378,8 +372,9 @@ def getStringFromUser(message, value=''):
     return value
 
 
-def getYesNoFromUser(message, value=''):
-    """ get a yes/no value from the command line"""
+def getYesNoFromUser(message, value=True):
+    """Get yes/no value from the command line"""
+
     msg2 = ''.join([message, ' (', str(value), ') (Y,n): '])
     newValue = raw_input(msg2)
 
@@ -392,9 +387,8 @@ def getYesNoFromUser(message, value=''):
     elif(newValue == 'n' or newValue == 'no' or newValue == 'N'):
         return False
 
-    return None
-
+    raise InputError("Please choose y/n")
 
 if __name__ == '__main__':
-    """ geneirc main statement"""
-    configure_gitmarks()
+    """Start"""
+    sys.exit(configure_gitmarks())
