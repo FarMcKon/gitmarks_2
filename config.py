@@ -300,50 +300,43 @@ def create_or_update_settings(user_settings, settings_filename,
     fh = open(settings_filename, 'r')
     raw_settings = fh.readlines()
     fh.close()
+
+    # Lines to be written to settings file with mesh of default and user
+    # settings as requested
     newlines = []
 
-    # Parse lines of settings file
+    # Parse lines of settings file and override with user-supplied setting if
+    # it exists otherwise, leave the setting alone (all settings are defaulted
+    # with example above)
     for line in raw_settings:
         newline = line.rstrip()
 
-        if '=' in line:
-            comment = None
-            val = None
-            var = None
+        # Skip comment lines and lines that don't have a setting specified
+        if line.startswith('#') or '=' not in line:
+            newlines.append(line)
+            continue
 
-            if (line.split('#') < 1):
-                comment = line.split('#')[-1]
-                print '\thas comment ' + str(comment)
+        # File is key=value format
+        var = line.split('=')[0].lstrip().rstrip()
+        val = ''.join(line.split('=')[1:]).lstrip().rstrip()
 
-            var = line.split('=')[0]
-            val = ''.join(line.split('=')[1:])
-            var = var.lstrip().rstrip()
-            val = val.lstrip().rstrip()
-
-            print '\tupdating var ' + str(var) + ' old val ' + str(val)
-
-            if var in user_settings:
-                if type(user_settings[var]) is str:
-                    newline = var + " = '" + str(user_settings[var]) + "'"
-                else:
-                    newline = var + " = " + str(user_settings[var])
-
-                if comment:
-                    newline += ' # ' + comment
-
-            print 'updated line "' + newline + '"'
-
-        else:
-            print 'no update on "' + newline + '"'
+        # Overwrite default setting if user specified it
+        if var in user_settings:
+            if type(user_settings[var]) is str:
+                newline = var + " = '" + str(user_settings[var]) + "'"
+            else:
+                newline = var + " = " + str(user_settings[var])
 
         newlines.append(newline)
 
+    # We better have written every line of the example file, otherwise we
+    # missed something and have a SW bug
     if len(newlines) == len(raw_settings):
         fh = open(settings_filename, 'w')
         fh.write('\n'.join(newlines))
         fh.close()
     else:
-        raise SettingsError("settings size did not match")
+        raise SettingsError("Settings size did not match")
 
 
 def getIntFromUser(message, value=''):
