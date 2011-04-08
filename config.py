@@ -36,7 +36,7 @@ def main():
          - 1 (optional) for content. This can be non-repo, or nonexistant
     """
 
-    if not getYesNoFromUser("Ready to start?"):
+    if not get_yes_or_no_from_user("Ready to start?"):
         print "Goodbye! Share and Enjoy."
         return 0
 
@@ -57,10 +57,10 @@ def configure_gitmarks():
     user_settings = config_settings_from_user()
 
     try:
-        cont = getYesNoFromUser("Setup up local environment from above " + \
-                                "settings?")
-    except InputError, e:
-        print str(e)
+        cont = get_yes_or_no_from_user("Setup up local environment from " + \
+                                        "above settings?")
+    except InputError, err:
+        print str(err)
         return -1
 
     if not cont:
@@ -98,9 +98,9 @@ def create_local_gitmarks_folders():
     # Now we can load the settings we just created
     try:
         import settings
-    except ImportError, e:
+    except ImportError, err:
         print "Failed loading settings.py module"
-        raise e
+        raise err
 
     abs_base_dir = os.path.abspath(settings.GITMARK_BASE_DIR)
 
@@ -187,35 +187,35 @@ def create_local_gitmarks_folders():
     os.chdir(cwd_dir)
 
 
-def clone_to_local(baseDir, folderName, remoteGitRepo):
-    """Clones a repository at remoteGitRepo to a local directory"""
+def clone_to_local(base_dir, folder_name, remote_git_repo):
+    """Clones a repository at remote_git_repo to a local directory"""
 
-    print "Cloning repository '%s' to directory '%s'" % (remoteGitRepo,
-                                                        folderName)
+    print "Cloning repository '%s' to directory '%s'" % (remote_git_repo,
+                                                        folder_name)
 
     #swizzle our process location so that we get added to the right repo
-    baseDir = os.path.abspath(baseDir)
+    base_dir = os.path.abspath(base_dir)
     cwd_dir = os.path.abspath(os.getcwd())
-    os.chdir(os.path.abspath(baseDir))
-    ret = subprocess.call(['git', 'clone', remoteGitRepo, folderName],
+    os.chdir(os.path.abspath(base_dir))
+    ret = subprocess.call(['git', 'clone', remote_git_repo, folder_name],
                             shell=USE_SHELL)
     os.chdir(cwd_dir)
     return ret
 
 
-def make_gitmark_subdirs(folderName, subdirsList):
+def make_gitmark_subdirs(folder_name, subdirs_list):
     """ makes a stack of gitmarks subdirectories at the folder listed """
-    for newDir in subdirsList:
-        newDir = os.path.join(folderName, newDir)
-        newDir = os.path.abspath(newDir)
+    for new_dir in subdirs_list:
+        new_dir = os.path.join(folder_name, new_dir)
+        new_dir = os.path.abspath(new_dir)
         os.makedirs('mkdir')
         #TODO: appears git does not add empty dirs. If it did, we would add
         #      that here
     return
 
 
-def folder_is_git_repo(folderName):
-    git_folder = os.path.join(folderName, '/.git/')
+def folder_is_git_repo(folder_name):
+    git_folder = os.path.join(folder_name, '/.git/')
     return os.path.isdir(git_folder)
 
 
@@ -225,8 +225,8 @@ def config_settings_from_user():
     base_dir = get_string_from_user('What base directories do you want ' + \
                     'for your repos?', example_settings.GITMARK_BASE_DIR)
 
-    get_content = getYesNoFromUser('Do you want to pull down content of ' + \
-                    'page when you download a bookmark?',
+    get_content = get_yes_or_no_from_user('Do you want to pull down ' + \
+                    'content of page when you download a bookmark?',
                     example_settings.GET_CONTENT)
 
     content_cache_mb = get_int_from_user('Do you want to set a maximum MB ' + \
@@ -242,8 +242,8 @@ def config_settings_from_user():
                         example_settings.REMOTE_PRIVATE_REPO)
 
     remote_content_repo = None
-    content_as_reop = getYesNoFromUser('Do you want your content folder ' + \
-                        'to be stored as a repository?',
+    content_as_reop = get_yes_or_no_from_user('Do you want your content ' + \
+                        'folder to be stored as a repository?',
                         example_settings.CONTENT_AS_REPO)
 
     if content_as_reop is True:
@@ -317,7 +317,8 @@ def create_or_update_settings(user_settings, settings_filename,
         var = line.split('=')[0].lstrip().rstrip()
         val = ''.join(line.split('=')[1:]).lstrip().rstrip()
 
-        # Overwrite default setting if user specified it
+        # Overwrite default setting if user specified it otherwise just write
+        # default one
         if var in user_settings:
             if type(user_settings[var]) is str:
                 newline = var + " = '" + str(user_settings[var]) + "'"
@@ -342,14 +343,14 @@ def get_int_from_user(message, value=''):
     value is entered by the user. Uses default value of parse error happens
     """
     msg2 = ' '.join([message, ' (', str(value), ') (int): '])
-    newValue = raw_input(msg2)
-    if(newValue == "" or newValue == "\n"):
+    new_value = raw_input(msg2)
+    if(new_value == "" or new_value == "\n"):
         return int(value)
 
     try:
-        return int(newValue)
+        return int(new_value)
     except:
-        print "int decode fail for " + str(newValue) + \
+        print "int decode fail for " + str(new_value) + \
                 " Using default value of" + str(value)
         return int(value)
 
@@ -363,19 +364,19 @@ def get_string_from_user(message, value=''):
     return value
 
 
-def getYesNoFromUser(message, value=True):
+def get_yes_or_no_from_user(message, value=True):
     """Get yes/no value from the command line"""
 
     msg2 = ''.join([message, ' (', str(value), ') (Y,n): '])
-    newValue = raw_input(msg2)
+    new_value = raw_input(msg2)
 
-    if(newValue == "" or newValue == "\n"):
+    if(new_value == "" or new_value == "\n"):
         return value
 
-    if(newValue == 'Y' or newValue == 'Yes' or newValue == 'y'):
+    if(new_value == 'Y' or new_value == 'Yes' or new_value == 'y'):
         return True
 
-    elif(newValue == 'n' or newValue == 'no' or newValue == 'N'):
+    elif(new_value == 'n' or new_value == 'no' or new_value == 'N'):
         return False
 
     raise InputError("Please choose y/n")
