@@ -248,13 +248,6 @@ def config_settings_from_user():
                                 'for your content?',
                                 example_settings.REMOTE_CONTENT_REPO)
 
-    print "-- Pointless Info --"
-    fav_color = getStringFromUser('What is your favorite color?',
-                    example_settings.FAVORITE_COLOR)
-    wv_u_swallow = getStringFromUser('What is the windspeed velocity of ' + \
-                    'an unladen swallow?',
-                    example_settings.UNLADEN_SWALLOW_GUESS)
-
     print "-- User Info --"
     user_name = getStringFromUser("What username do you want to use?",
                     example_settings.USER_NAME)
@@ -270,7 +263,6 @@ def config_settings_from_user():
     'REMOTE_PRIVATE_REPO': remote_private_repo,
     'SAVE_CONTENT_TO_REPO': content_as_reop,
     'REMOTE_CONTENT_REPO': remote_content_repo,
-    'FAVORITE_COLOR': fav_color, 'UNLADEN_SWALLOW_GUESS': wv_u_swallow,
     "PUBLIC_GITMARK_REPO_DIR": example_settings.PUBLIC_GITMARK_REPO_DIR,
     'PRIVATE_GITMARK_REPO_DIR': example_settings.PRIVATE_GITMARK_REPO_DIR,
     'CONTENT_GITMARK_DIR': example_settings.CONTENT_GITMARK_DIR,

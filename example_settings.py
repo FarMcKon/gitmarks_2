@@ -28,7 +28,3 @@ GITMARKS_WEB_PORT = 44865
 USER_NAME ="Example Name"
 USER_EMAIL="ExampleName@example.com"
 MACHINE_NAME="Example Computer Name"
-
-# Other Stuff
-FAVORITE_COLOR = "Red"
-UNLADEN_SWALLOW_GUESS = "I don't know"
