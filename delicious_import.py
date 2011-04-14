@@ -8,13 +8,11 @@ Copyright (c) 2010 Hilary Mason. All rights reserved.
 """
 
 import sys
-import os
-import urllib2
+import urllib
 from xml.dom import minidom
 from xml.parsers import expat
-from optparse import OptionParser
 
-from gitmark import *
+from gitmark import gitmark
 from gitmark_add import addToRepo, addToPublicRepo
 
 
