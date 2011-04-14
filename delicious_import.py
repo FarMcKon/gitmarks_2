@@ -17,6 +17,7 @@ from gitmark_add import addToRepo, addToPublicRepo
 
 
 def cache_to_local_file(local_file, content):
+    """Save content in local file"""
     h = open(local_file, 'w')
     h.write(content)
     h.close()
