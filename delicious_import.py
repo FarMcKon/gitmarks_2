@@ -47,7 +47,7 @@ def import_delicious_to_local_git(username, password='', url=None):
     #cache_to_local_file('delicious_cache.htm', content):
 
     # check for signs of a yahoo error page, with causes minidom to flip out
-    if (len(content) >=6 and content[:5] == '<!-- '):
+    if (len(content) >= 6 and content[:5] == '<!-- '):
         print content
         print "yahoo error, no data fetched "
         return
@@ -75,23 +75,26 @@ def import_delicious_to_local_git(username, password='', url=None):
             url = post.getAttribute('href')
             desc = post.getAttribute('description')
             timestamp = post.getAttribute('time')
-            raw_tags  = post.getAttribute('tag')
-            extended =  post.getAttribute('extended')
-            meta     =  post.getAttribute('meta')
+            raw_tags = post.getAttribute('tag')
+            extended = post.getAttribute('extended')
+            meta = post.getAttribute('meta')
+
             # turn a comma separated list of tags into a real list of tags
             tags = [tag.lstrip().rstrip() for tag in raw_tags.split()]
             privateString = post.getAttribute('private')
 
-            g = gitmark(url, 'delicious:'+ str(username))
+            g = gitmark(url, 'delicious:' + str(username))
             g.description = desc
             g.tags = tags
             g.time = timestamp
             g.rights = None
             g.meta = meta
             g.extended = extended
+
             if(privateString == "0"):
                 print "not private"
                 g.private = False
+
             newMarksList.append(g)
             #break, for single test
             break
@@ -115,14 +118,14 @@ def import_delicious_to_local_git(username, password='', url=None):
             print >> sys.stderr, "backup interrupted"
             return
         except e:
-            print >> sys.stderr, ("unknown exception %s" %(e))
+            print >> sys.stderr, ("unknown exception %s" % (e))
 
     print "all kinds of new gitmarks!!"
     print "we have %d new marks" % len(newMarksList)
 
     for mark in newMarksList:
         # FUTURE: speeed this up, by passing a whole list
-        addToRepo(newMarksList[0],doPush=False)
+        addToRepo(newMarksList[0], doPush=False)
 
 # -- hack test main for when yahoo sucks and I need to test
 if __name__ == '__offfline_main__':
@@ -132,7 +135,7 @@ if __name__ == '__offfline_main__':
                 "SSH and SCP: Howto, tips & tricks \u00ab Linux Tutorial Blog",
         "rights": None,
         "creator": "delicious:farmckon",
-        "uri":"http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks",
+        "uri": "http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks",
         "private": False,
         "meta": "09f8b3205ee44cac3a94305db4337a7b",
         "time": "2011-02-05T21:16:48Z",
@@ -140,9 +143,7 @@ if __name__ == '__offfline_main__':
             "ssh",
             "scp",
             "linux_tutorial",
-            "howto"
-        ]
-    }
+            "howto"]}
 
     g = gitmark(x['uri'], x['creator'])
     g.description = x['description']
@@ -158,23 +159,22 @@ if __name__ == '__offfline_main__':
 # -- real main.
 
 if __name__ == '__main__':
-
-    usage =  """
+    usage = """
         Usage: python delicious_import.py cached-page-uri
         OR
         Usage: python delicious_import.py username password
         ***Password and username are sent as HTTPS***"
         """
 
-    if( len(sys.argv) == 2):
+    if (len(sys.argv) == 2):
         import getpass
         import socket
         username = getpass.getuser()
         host = socket.gethostname()
-        username = '%s@%s' %(str(username), str(host))
+        username = '%s@%s' % (str(username), str(host))
 
         import_delicious_to_local_git(username, password=None, url=sys.argv[1])
-    elif(len(sys.argv) == 3):
+    elif (len(sys.argv) == 3):
         try:
             (username, password) = sys.argv[1:]
         except ValueError:
@@ -182,4 +182,3 @@ if __name__ == '__main__':
         import_delicious_to_local_git(username, password)
     else:
         print usage
-
