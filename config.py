@@ -29,11 +29,11 @@ def main():
 
     print """
         Wecome to gitmarks configurator. This will setup a couple of local
-        repositories for you to use as yor gitmarks system.  Gitmarks will
+        repositories for you to use as your gitmarks system.  Gitmarks will
         maintain 2-3 repositories.
          - 1 for public use (world+dog read)
          - 1 for friends use (with some encryption)
-         - 1 (optional) for content. This can be non-repo, or nonexistant
+         - 1 (optional) for content. This can be non-repo, or nonexistant.
     """
 
     if not get_yes_or_no_from_user("Ready to start?"):
