@@ -355,10 +355,14 @@ def get_int_from_user(message, value=''):
         return int(value)
 
 
-def get_string_from_user(message, value=''):
+def get_string_from_user(message, default):
     """get a string value from the command line"""
-    msg2 = ''.join([message, ' (', str(value), ') (string): '])
+    msg2 = ''.join([message, ' (', str(default), ') (string): '])
     value = raw_input(msg2)
+
+    if not len(value):
+        return default
+
     return value
 
 
