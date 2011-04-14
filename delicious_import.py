@@ -15,6 +15,7 @@ from xml.parsers import expat
 from optparse import OptionParser
 
 from gitmark import *
+from gitmark_add import addToRepo, addToPublicRepo
 
 
 def cache_to_local_file(local_file, content):
@@ -39,7 +40,7 @@ def import_delicious_to_local_git(username, password='', url=None):
         h = urllib.urlopen(url)
     else:
         # Url is actually a local file in this case
-        url = urllub.pathname2url(url)
+        url = urllib.pathname2url(url)
         h = open(url)
     content = h.read()
     h.close()
@@ -156,8 +157,6 @@ if __name__ == '__offfline_main__':
     addToPublicRepo(g)
 
 
-# -- real main.
-
 if __name__ == '__main__':
     usage = """
         Usage: python delicious_import.py cached-page-uri
@@ -169,10 +168,10 @@ if __name__ == '__main__':
     if (len(sys.argv) == 2):
         import getpass
         import socket
+
         username = getpass.getuser()
         host = socket.gethostname()
         username = '%s@%s' % (str(username), str(host))
-
         import_delicious_to_local_git(username, password=None, url=sys.argv[1])
     elif (len(sys.argv) == 3):
         try:
