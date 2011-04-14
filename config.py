@@ -114,10 +114,9 @@ def setup_repo(remote_repo, base_dir, local_dir, subdirs):
             os.makedirs(abs_repo_dir)
 
         # Init the new git repo
-        cwd_dir = os.path.abspath(os.getcwd())
-        os.chdir(os.path.abspath(abs_repo_dir))
-        ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
-        os.chdir(cwd_dir)
+        ret = init_git_repo(abs_repo_dir)
+        if(ret != 0):
+            raise GitError("Initializing '%s' failed" % (abs_repo_dir))
 
         # Create our sub-dirs
         make_gitmark_subdirs(abs_repo_dir, subdirs)
@@ -214,6 +213,20 @@ def clone_to_local(base_dir, folder_name, remote_git_repo):
     ret = subprocess.call(['git', 'clone', remote_git_repo, folder_name],
                             shell=USE_SHELL)
     os.chdir(cwd_dir)
+    return ret
+
+
+def init_git_repo(directory):
+    """Initalize git repo in directory (absolute path)"""
+
+    # Change directory and init
+    cwd_dir = os.path.abspath(os.getcwd())
+    os.chdir(os.path.abspath(directory))
+    ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
+
+    # Change back to what we were
+    os.chdir(cwd_dir)
+
     return ret
 
 
