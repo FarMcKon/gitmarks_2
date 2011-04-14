@@ -154,50 +154,18 @@ def create_local_gitmarks_folders():
     setup_repo(settings.REMOTE_PUBLIC_REPO, settings.GITMARK_BASE_DIR,
                settings.PUBLIC_GITMARK_REPO_DIR, subdirs)
 
-    private_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
-                                        settings.PRIVATE_GITMARK_REPO_DIR)
+    # Setup the private repo locally
+    setup_repo(settings.REMOTE_PRIVATE_REPO, settings.GITMARK_BASE_DIR,
+               settings.PRIVATE_GITMARK_REPO_DIR, subdirs)
 
-    # -- if we have remote private repo, try to git-clone to create local copy.
-    if (settings.REMOTE_PRIVATE_REPO != None):
-        if not folder_is_git_repo(private_gitmarks_dir):
-            ret = clone_to_local(settings.GITMARK_BASE_DIR,
-                                    private_gitmarks_dir,
-                                    settings.REMOTE_PRIVATE_REPO)
-            if(ret != 0):
-                raise GitError("remote public clone to local failed")
-
-    # -- no remote private repo, make a dir and git-init it as needed
-    else:
-        abs_private_gitmarks_dir = os.path.abspath(private_gitmarks_dir)
-
-        # -- create a dir if we need to.
-        if not os.path.isdir(abs_private_gitmarks_dir):
-            os.makedirs(abs_private_gitmarks_dir)
-
-        # -- init the new git repo in that dir
-        cwd_dir = os.path.abspath(os.getcwd())
-        os.chdir(os.path.abspath(abs_private_gitmarks_dir))
-        ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
-        os.chdir(cwd_dir)
-
-        # -- create our sub-dirs if needed
-        make_gitmark_subdirs(abs_private_gitmarks_dir,
-                                [settings.BOOKMARK_SUB_PATH,
-                                settings.TAG_SUB_PATH,
-                                settings.MSG_SUB_PATH])
-
-    # -- Create our local content directory and repo, even if we never use it
+    # Create our local content directory and repo, even if we never use it
     content_dir = os.path.join(settings.GITMARK_BASE_DIR,
                                 settings.CONTENT_GITMARK_DIR)
     if not os.path.isdir(content_dir):
+        print "Creating content directory, '%s', for gitmarks" % (content_dir)
         os.makedirs(content_dir)
-    else:
-        print "Content directory, '%s', already exists" % (content_dir)
 
-    cwd_dir = os.path.abspath(os.getcwd())
-    os.chdir(os.path.abspath(content_dir))
-    ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
-    os.chdir(cwd_dir)
+    init_git_repo(content_dir)
 
 
 def clone_to_local(base_dir, folder_name, remote_git_repo):
