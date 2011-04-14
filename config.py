@@ -85,40 +85,42 @@ def download_needed_software():
     pass
 
 
-def setup_public_repo(settings):
-    """Setup public repository in local directory"""
+def setup_repo(remote_repo, base_dir, local_dir, subdirs):
+    """
+    Setup repository in local directory and populate it with given
+    subdirectories
+        remote_repo - Name of remote repo
+        base_dir    - Full path to base directory for repo
+        local_dir   - Name of local directory (subdirectory within the base_dir
+                      to put repo
+        subdirs      - List of sub directories to populate repo with
+    """
 
-    public_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
-                                        settings.PUBLIC_GITMARK_REPO_DIR)
+    repo_dir = os.path.join(base_dir, local_dir)
 
     # If we have remote public repo, try to git-clone to create local copy.
-    if (settings.REMOTE_PUBLIC_REPO != None):
-        if not folder_is_git_repo(public_gitmarks_dir):
-            ret = clone_to_local(settings.GITMARK_BASE_DIR,
-                                    public_gitmarks_dir,
-                                    settings.REMOTE_PUBLIC_REPO)
+    if (remote_repo != None):
+        if not folder_is_git_repo(repo_dir):
+            ret = clone_to_local(base_dir, repo_dir, remote_repo)
             if(ret != 0):
                 raise GitError("Remote public clone to local failed")
 
     # No remote public repo, make a dir and git-init it as needed
     else:
-        abs_public_gitmarks_dir = os.path.abspath(public_gitmarks_dir)
+        abs_repo_dir = os.path.abspath(repo_dir)
 
         # Create a dir if we need to
-        if not os.path.isdir(abs_public_gitmarks_dir):
-            os.makedirs(abs_public_gitmarks_dir)
+        if not os.path.isdir(abs_repo_dir):
+            os.makedirs(abs_repo_dir)
 
         # Init the new git repo
         cwd_dir = os.path.abspath(os.getcwd())
-        os.chdir(os.path.abspath(abs_public_gitmarks_dir))
+        os.chdir(os.path.abspath(abs_repo_dir))
         ret = subprocess.call(['git', 'init', '.', ], shell=USE_SHELL)
         os.chdir(cwd_dir)
 
         # Create our sub-dirs
-        make_gitmark_subdirs(abs_public_gitmarks_dir,
-                                [settings.BOOKMARK_SUB_PATH,
-                                settings.TAG_SUB_PATH,
-                                settings.MSG_SUB_PATH])
+        make_gitmark_subdirs(abs_repo_dir, subdirs)
 
 
 def create_local_gitmarks_folders():
@@ -140,19 +142,24 @@ def create_local_gitmarks_folders():
 
     abs_base_dir = os.path.abspath(settings.GITMARK_BASE_DIR)
 
-    # -- Create a base directory if we need to
+    # List of subdirectories to populate repos with
+    subdirs = [settings.BOOKMARK_SUB_PATH, settings.TAG_SUB_PATH,
+                settings.MSG_SUB_PATH]
+
+    # Create a base directory if we need to
     if not os.path.isdir(abs_base_dir):
         print "Creating base directory, '%s', for gitmarks" % (abs_base_dir)
         os.makedirs(abs_base_dir)
 
     # Setup the public repo locally
-    setup_public_repo(settings)
+    setup_repo(settings.REMOTE_PUBLIC_REPO, settings.GITMARK_BASE_DIR,
+               settings.PUBLIC_GITMARK_REPO_DIR, subdirs)
 
     private_gitmarks_dir = os.path.join(settings.GITMARK_BASE_DIR,
                                         settings.PRIVATE_GITMARK_REPO_DIR)
 
     # -- if we have remote private repo, try to git-clone to create local copy.
-    if(settings.REMOTE_PRIVATE_REPO != None):
+    if (settings.REMOTE_PRIVATE_REPO != None):
         if not folder_is_git_repo(private_gitmarks_dir):
             ret = clone_to_local(settings.GITMARK_BASE_DIR,
                                     private_gitmarks_dir,
