@@ -47,7 +47,7 @@ def import_delicious_to_local_git(username, password='', url=None):
     #cache_to_local_file('delicious_cache.htm', content):
 
     # check for signs of a yahoo error page, with causes minidom to flip out
-    if( len(content) >=6 and content[:5] == '<!-- ' ):
+    if (len(content) >=6 and content[:5] == '<!-- '):
         print content
         print "yahoo error, no data fetched "
         return
@@ -59,7 +59,11 @@ def import_delicious_to_local_git(username, password='', url=None):
         print "== Above content caused minidom to flipped out\n %s" % (e)
         return
 
-    # sample post: <post href="http://www.pixelbeat.org/cmdline.html" hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A practical reference" tag="linux tutorial reference" time="2010-11-29T01:07:35Z" extended="" meta="c79362665abb0303d577b6b9aa341599" />
+    # sample post: <post href="http://www.pixelbeat.org/cmdline.html"
+    # hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A
+    # practical reference" tag="linux tutorial reference"
+    # time="2010-11-29T01:07:35Z" extended=""
+    # meta="c79362665abb0303d577b6b9aa341599" />
 
     post_list = x.getElementsByTagName('post')
 
@@ -93,7 +97,7 @@ def import_delicious_to_local_git(username, password='', url=None):
             break
 
 #            # turn a comma separated list of tags into a real list of tags
-#            # TRICKY: Set the authoring date of the commit based on the imported
+#            # TRICKY: Set authoring date of the commit based on the imported
 #            # timestamp. git reads the GIT_AUTHOR_DATE environment var.
 #            os.environ['GIT_AUTHOR_DATE'] = timestamp
 #
@@ -108,7 +112,7 @@ def import_delicious_to_local_git(username, password='', url=None):
 #                    post_index + 1, post_list.length,
 #                    (post_index + 1.0) / post_list.length * 100)
         except (KeyboardInterrupt, SystemExit):
-            print >>sys.stderr, ("backup interrupted by KeyboardInterrupt/SystemExit" )
+            print >> sys.stderr, "backup interrupted"
             return
         except e:
             print >> sys.stderr, ("unknown exception %s" %(e))
@@ -122,24 +126,23 @@ def import_delicious_to_local_git(username, password='', url=None):
 
 # -- hack test main for when yahoo sucks and I need to test
 if __name__ == '__offfline_main__':
-
-
-    x = {    "extended": "",
-    "hash": "082d479d946d5e9ebd891509446d9cbc",
-    "description": "SSH and SCP: Howto, tips & tricks \u00ab Linux Tutorial Blog",
-    "rights": None,
-    "creator": "delicious:farmckon",
-    "uri": "http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks",
-    "private": False,
-    "meta": "09f8b3205ee44cac3a94305db4337a7b",
-    "time": "2011-02-05T21:16:48Z",
-    "tags": [
-        "ssh",
-        "scp",
-        "linux_tutorial",
-        "howto"
-    ]
-}
+    x = {"extended": "",
+        "hash": "082d479d946d5e9ebd891509446d9cbc",
+        "description":
+                "SSH and SCP: Howto, tips & tricks \u00ab Linux Tutorial Blog",
+        "rights": None,
+        "creator": "delicious:farmckon",
+        "uri":"http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks",
+        "private": False,
+        "meta": "09f8b3205ee44cac3a94305db4337a7b",
+        "time": "2011-02-05T21:16:48Z",
+        "tags": [
+            "ssh",
+            "scp",
+            "linux_tutorial",
+            "howto"
+        ]
+    }
 
     g = gitmark(x['uri'], x['creator'])
     g.description = x['description']
@@ -156,7 +159,12 @@ if __name__ == '__offfline_main__':
 
 if __name__ == '__main__':
 
-    usage =  "Usage: python delicious_import.py cached-page-uri\nOR\nUsage: python delicious_import.py username password\n***Password and username are sent as HHTTPS***"
+    usage =  """
+        Usage: python delicious_import.py cached-page-uri
+        OR
+        Usage: python delicious_import.py username password
+        ***Password and username are sent as HTTPS***"
+        """
 
     if( len(sys.argv) == 2):
         import getpass
