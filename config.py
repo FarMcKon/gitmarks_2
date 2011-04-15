@@ -15,7 +15,7 @@ import subprocess
 import shutil
 
 from gitmarks_exceptions import InputError, SettingsError, GitError
-
+from config_helpers import get_int, get_string, get_yes_or_no
 
 # Arguments are passed directly to git, not through the shell, to avoid the
 # need for shell escaping. On Windows, however, commands need to go through the
@@ -36,7 +36,7 @@ def main():
          - 1 (optional) for content. This can be non-repo, or nonexistant.
     """
 
-    if not get_yes_or_no_from_user("Ready to start?"):
+    if not get_yes_or_no("Ready to start?"):
         print "Goodbye! Share and Enjoy."
         return 0
 
@@ -54,10 +54,10 @@ def configure_gitmarks():
     download_needed_software()
 
     # Generate our configuration settings
-    user_settings = config_settings_from_user()
+    user_settings = config_settings()
 
     try:
-        cont = get_yes_or_no_from_user("Setup up local environment from " + \
+        cont = get_yes_or_no("Setup up local environment from " + \
                                         "above settings?")
     except InputError, err:
         print str(err)
@@ -215,44 +215,44 @@ def folder_is_git_repo(folder_name):
     return os.path.isdir(git_folder)
 
 
-def config_settings_from_user():
+def config_settings():
     """Returns dict of config settings set interactivly by user"""
 
-    base_dir = get_string_from_user('What base directories do you want ' + \
+    base_dir = get_string('What base directories do you want ' + \
                     'for your repos?', example_settings.GITMARK_BASE_DIR)
 
-    get_content = get_yes_or_no_from_user('Do you want to pull down ' + \
+    get_content = get_yes_or_no('Do you want to pull down ' + \
                     'content of page when you download a bookmark?',
                     example_settings.GET_CONTENT)
 
-    content_cache_mb = get_int_from_user('Do you want to set a maximum MB ' + \
+    content_cache_mb = get_int('Do you want to set a maximum MB ' + \
                     'of content cache?',
                     example_settings.CONTENT_CACHE_SIZE_MB)
 
-    remote_pub_repo = get_string_from_user('Specify remote git repository ' + \
+    remote_pub_repo = get_string('Specify remote git repository ' + \
                         'for your public bookmarks',
                         example_settings.REMOTE_PUBLIC_REPO)
 
-    remote_private_repo = get_string_from_user('Specify remote git ' + \
+    remote_private_repo = get_string('Specify remote git ' + \
                         'repository for your private bookmarks?',
                         example_settings.REMOTE_PRIVATE_REPO)
 
     remote_content_repo = None
-    content_as_reop = get_yes_or_no_from_user('Do you want your content ' + \
+    content_as_reop = get_yes_or_no('Do you want your content ' + \
                         'folder to be stored as a repository?',
                         example_settings.CONTENT_AS_REPO)
 
     if content_as_reop is True:
-        remote_content_repo = get_string_from_user('What is git ' + \
+        remote_content_repo = get_string('What is git ' + \
                                 'repository for your content?',
                                 example_settings.REMOTE_CONTENT_REPO)
 
     print "-- User Info --"
-    user_name = get_string_from_user("What username do you want to use?",
+    user_name = get_string("What username do you want to use?",
                     example_settings.USER_NAME)
-    user_email = get_string_from_user("What email do you want to use?",
+    user_email = get_string("What email do you want to use?",
                     example_settings.USER_EMAIL)
-    machine_name = get_string_from_user("What is the name of this computer?",
+    machine_name = get_string("What is the name of this computer?",
                     example_settings.MACHINE_NAME)
 
     return {'GITMARK_BASE_DIR': base_dir,
@@ -332,51 +332,6 @@ def create_or_update_settings(user_settings, settings_filename,
     else:
         raise SettingsError("Settings size did not match")
 
-
-def get_int_from_user(message, value=''):
-    """
-    Prompts a user for an input int. Uses the default value if no
-    value is entered by the user. Uses default value of parse error happens
-    """
-    msg2 = ' '.join([message, ' (', str(value), ') (int): '])
-    new_value = raw_input(msg2)
-    if(new_value == "" or new_value == "\n"):
-        return int(value)
-
-    try:
-        return int(new_value)
-    except ValueError:
-        print "Invalid integer, '%s', using default value" % (str(new_value))
-        return int(value)
-
-
-def get_string_from_user(message, default):
-    """get a string value from the command line"""
-    msg2 = ''.join([message, ' (', str(default), ') (string): '])
-    value = raw_input(msg2)
-
-    if not len(value):
-        return default
-
-    return value
-
-
-def get_yes_or_no_from_user(message, value=True):
-    """Get yes/no value from the command line"""
-
-    msg2 = ''.join([message, ' (', str(value), ') (Y,n): '])
-    new_value = raw_input(msg2)
-
-    if(new_value == "" or new_value == "\n"):
-        return value
-
-    if(new_value == 'Y' or new_value == 'Yes' or new_value == 'y'):
-        return True
-
-    elif(new_value == 'n' or new_value == 'no' or new_value == 'N'):
-        return False
-
-    raise InputError("Please choose y/n")
 
 if __name__ == '__main__':
     sys.exit(main())
