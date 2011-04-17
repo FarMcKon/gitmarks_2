@@ -7,19 +7,19 @@ Created by Hilary Mason on 2010-11-28.
 Copyright (c) 2010 Hilary Mason. All rights reserved.
 """
 
-import sys, os
-import urllib2
+import sys
+import urllib
 from xml.dom import minidom
 from xml.parsers import expat
-from optparse import OptionParser
 
-from gitmark import *
-from gitmark_add import *	
+from gitmark import gitmark
+from gitmark_add import addToRepo, addToPublicRepo
 
 def cache_to_local_file(local_file, content):
-	h = open(local_file, 'w')
-	h.write(content)
-	h.close()
+    """Save content in local file"""
+    h = open(local_file, 'w')
+    h.write(content)
+    h.close()
 
 
 def import_delicious_to_local_git(username, password='', url=None):
@@ -55,8 +55,7 @@ def import_delicious_to_local_git(username, password='', url=None):
 		if(fh):
 			fh.write(content)
 			fh.close()
-			print "Saved problematic file as %s" % (saveFile)
-			
+			print "Saved problematic file as %s" % (saveFile)			
 		return
 	
 	# sample post: <post href="http://www.pixelbeat.org/cmdline.html" hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A practical reference" tag="linux tutorial reference" time="2010-11-29T01:07:35Z" extended="" meta="c79362665abb0303d577b6b9aa341599" />
@@ -107,58 +106,57 @@ def import_delicious_to_local_git(username, password='', url=None):
 		err = addToRepo(mark,doPush=False)
 		print "mark add error %s" %str(err)	
 
+
 # -- hack test main for when yahoo sucks and I need to test
 if __name__ == '__offfline_main__':
+    x = {"extended": "",
+        "hash": "082d479d946d5e9ebd891509446d9cbc",
+        "description":
+                "SSH and SCP: Howto, tips & tricks \u00ab Linux Tutorial Blog",
+        "rights": None,
+        "creator": "delicious:farmckon",
+        "uri": "http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks",
+        "private": False,
+        "meta": "09f8b3205ee44cac3a94305db4337a7b",
+        "time": "2011-02-05T21:16:48Z",
+        "tags": [
+            "ssh",
+            "scp",
+            "linux_tutorial",
+            "howto"]}
 
+    g = gitmark(x['uri'], x['creator'])
+    g.description = x['description']
+    g.tags = x['tags']
+    g.time = x['time']
+    g.rights = None
+    g.meta = x["meta"]
+    g.extended = x['extended']
+    g.private = x['private']
+    addToPublicRepo(g)
 
-	x = {    "extended": "", 
-    "hash": "082d479d946d5e9ebd891509446d9cbc", 
-    "description": "SSH and SCP: Howto, tips & tricks \u00ab Linux Tutorial Blog", 
-    "rights": None, 
-    "creator": "delicious:farmckon", 
-    "uri": "http://www.linuxtutorialblog.com/post/ssh-and-scp-howto-tips-tricks", 
-    "private": False, 
-    "meta": "09f8b3205ee44cac3a94305db4337a7b", 
-    "time": "2011-02-05T21:16:48Z", 
-    "tags": [
-        "ssh", 
-        "scp", 
-        "linux_tutorial", 
-        "howto"
-    ]
-}
-
-	g = gitmark(x['uri'], x['creator'])
-	g.description = x['description'] 
-	g.tags = x['tags']
-	g.time = x['time']
-	g.rights = None 
-	g.meta = x["meta"]
-	g.extended = x['extended']
-	g.private = x['private']
-	addToPublicRepo(g)
-
-	
-# -- real main. 
 
 if __name__ == '__main__':
- 
-	usage =	 "Usage: python delicious_import.py cached-page-uri\nOR\nUsage: python delicious_import.py username password\n***Password and username are sent as HHTTPS***"
+    usage = """
+        Usage: python delicious_import.py cached-page-uri
+        OR
+        Usage: python delicious_import.py username password
+        ***Password and username are sent as HTTPS***"
+        """
 
-	if( len(sys.argv) == 2): 
-		import getpass
-		import socket
-		username = getpass.getuser()
-		host = socket.gethostname()
-		username = '%s@%s' %(str(username), str(host))
+    if (len(sys.argv) == 2):
+        import getpass
+        import socket
 
-		import_delicious_to_local_git(username, password=None, url=sys.argv[1])
-	elif(len(sys.argv) == 3):
-		try:
-			(username, password) = sys.argv[1:]
-		except ValueError:
-			print usage
-		import_delicious_to_local_git(username, password)
-	else:
-		print usage
- 
+        username = getpass.getuser()
+        host = socket.gethostname()
+        username = '%s@%s' % (str(username), str(host))
+        import_delicious_to_local_git(username, password=None, url=sys.argv[1])
+    elif (len(sys.argv) == 3):
+        try:
+            (username, password) = sys.argv[1:]
+        except ValueError:
+            print usage
+        import_delicious_to_local_git(username, password)
+    else:
+        print usage

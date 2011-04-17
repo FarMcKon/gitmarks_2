@@ -1,2 +1,2 @@
-baseline_settings.py
 settings.py
+*.pyc
