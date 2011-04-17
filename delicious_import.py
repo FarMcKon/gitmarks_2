@@ -14,6 +14,7 @@ from xml.parsers import expat
 from optparse import OptionParser
 
 from gitmark import *
+from gitmark_add import *	
 
 def cache_to_local_file(local_file, content):
 	h = open(local_file, 'w')
@@ -47,7 +48,15 @@ def import_delicious_to_local_git(username, password='', url=None):
 		x = minidom.parseString(content)
 	except expat.ExpatError, e:
 		print content
+		saveFile = "minidom_freakout.xml"
+		fh = open(saveFile, "w")
 		print "== Above content caused minidom to flipped out\n %s" % (e)
+		print "Saving problematic file as %s" % (saveFile)
+		if(fh):
+			fh.write(content)
+			fh.close()
+			print "Saved problematic file as %s" % (saveFile)
+			
 		return
 	
 	# sample post: <post href="http://www.pixelbeat.org/cmdline.html" hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A practical reference" tag="linux tutorial reference" time="2010-11-29T01:07:35Z" extended="" meta="c79362665abb0303d577b6b9aa341599" />
@@ -76,40 +85,27 @@ def import_delicious_to_local_git(username, password='', url=None):
 			g.rights = None 
 			g.meta = meta
 			g.extended = extended
-			if(privateString == "0"):
-				print "not private"
+			
+			if(privateString == "0" or privateString==""):
 				g.private = False
-			newMarksList.append(g)
-			#break, for single test
-			break
 
-#			 # turn a comma separated list of tags into a real list of tags			   
-#			 # TRICKY: Set the authoring date of the commit based on the imported
-#			 # timestamp. git reads the GIT_AUTHOR_DATE environment var.
-#			 os.environ['GIT_AUTHOR_DATE'] = timestamp
-#	 
-#			 args = [url]
-#			 g = gitMarkImporter(options, args)
-#			 
-#			 # TRICKY:	Reset authoring timestamp (abundance of caution)
-#			 del os.environ['GIT_AUTHOR_DATE']
-#			 
-#			 if post_list.length > 1:
-#				 print '%d of %d bookmarks imported (%d%%)' % (
-#					 post_index + 1, post_list.length,
-#					 (post_index + 1.0) / post_list.length * 100)
+			newMarksList.append(g)
+			#break here for single test without data resetting/fixing
+
 		except (KeyboardInterrupt, SystemExit):
 			print >>sys.stderr, ("backup interrupted by KeyboardInterrupt/SystemExit" )
 			return 
-		except e:
+		except Exception as e:
 			print >> sys.stderr, ("unknown exception %s" %(e))
 
 	print "all kinds of new gitmarks!!"
 	print "we have %d new marks" % len(newMarksList)
-
+	
 	for mark in newMarksList:
 		# FUTURE: speeed this up, by passing a whole list
-		addToRepo(newMarksList[0],doPush=False)
+		print "adding mark %s to repo %s" %(str(mark.title), str(mark.private) )
+		err = addToRepo(mark,doPush=False)
+		print "mark add error %s" %str(err)	
 
 # -- hack test main for when yahoo sucks and I need to test
 if __name__ == '__offfline_main__':

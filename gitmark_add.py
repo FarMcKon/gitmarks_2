@@ -62,11 +62,12 @@ def updateRepoWith(gitmarksObj, doPush = True):
 	to push that update to the remote repository."""
 	# -- see if we need to add or update the mark
 	if not isInGitmarkPublicRepo(gitmarksObj):		
-		addToRepo(gitmarksObj, doPush)
+		return addToRepo(gitmarksObj, doPush)
 	else:
 		print "This bookmark is already in our repo. update?"
 		#TODO: write/run/do system to update gitmark
-		updateExistingInRepo(gitmarksObj, doPush)
+		return updateExistingInRepo(gitmarksObj, doPush)
+	return -1; 
 		
 def updateExistingInRepo(gitmarksObj, doPush = True):
 	""" Updates an existing gitmark file(s) on disk. """
@@ -103,8 +104,9 @@ def updateToPrivateRepo(gitmarksObj, doPush):
 def addToRepo(gitmarksObj, doPush = True):		
 	""" addToRepo function that does all of the heavy lifting"""
 	if(gitmarksObj.private != True):
-		addToPublicRepo(gitmarksObj, doPush)
-	addToPrivateRepo(gitmarksObj, doPush)
+		return addToPublicRepo(gitmarksObj, doPush)
+	print "adding mark %d to private repo" %str(gitmarkObj)
+	return  addToPrivateRepo(gitmarksObj, doPush)
 
 		
 def addToPrivateRepo(gitmarksObj, doPush = True):
@@ -130,7 +132,7 @@ def addToPublicRepo(gitmarksObj, doPush = True):
 	filename = os.path.abspath(filename)
 	# -get our string
 	gitmarksObj.setTimeIfEmpty()
-	bm_string = gitmarksObj.JOSNBlock() 
+	bm_string = gitmarksObj.JSONBlock() 
 	gitmarksBaseDir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
 
 

@@ -25,9 +25,8 @@ USE_SHELL = os.name == 'nt'
 
 
 class gitmark(object):
-	
 	# -- GitMarks members
-	# If you add member variables you don't want in a gitmark, delete them in JOSNBlock below
+	# If you add member variables you don't want in a gitmark, delete them in JSONBlock below
 	# Otherwise self.__dict__ works rong.
 	uri = None #string
 	hash = None #hash value 
@@ -172,7 +171,7 @@ class gitmark(object):
 			print '---'
 			print self.JSONBlock()
 			print '---'
-			#fwrite(self.JOSNBlock())
+			#fwrite(self.JSONBlock())
 			#fclose(fp)
 			# add git add here
 			
@@ -190,7 +189,7 @@ class gitmark(object):
 						
 
 			
-	def JOSNBlock(self):	
+	def JSONBlock(self):	
 		"""creates and retuns a JSON text block of 
 		current members of this gitMark. """
 		d = self.__dict__
@@ -230,8 +229,8 @@ class gitmark(object):
 
 	@classmethod	
 	def cls_hydrate(cls, filename):
-		""" 
-		Create a gitmark object from files on the local filesystem. 
+		"""  
+		Create and returns a gitmark object from files on the local filesystem. 
 		"""
 		f = open(filename,'r')
 		if(f):
@@ -241,9 +240,10 @@ class gitmark(object):
 			obj = json.loads(jsonObj)
 			print obj
 			mark = gitmark(settings.USER_NAME)
-			print "INCOMPLETE FUNCTION cls_hydrate"
-		else:
-			print "failed to read/load %s" %filename
+			mark.__dict__.update(obj) #force update dict from file
+			return mark 
+	
+		print "failed to read/load %s" %filename
 		return None
 	
 	@classmethod
@@ -322,45 +322,6 @@ class gitmark(object):
 		pipe = subprocess.Popen("git push origin master", shell=True) #Tricky: shell must be true
 		pipe.wait()
 		if gitBaseDir: 	os.chdir(cwd_dir)
-	 
-		 
-#	 @classmethod
-#	 def saveTagData(cls, tag, url, title, base_filename):
-#		 tag_filename = os.path.join(TAG_PATH, tag)
-#		 tag_writer = csv.writer(open(tag_filename, 'a'))
-#		 tag_writer.writerow([url, title, base_filename])
-#		 return tag_filename
-#
-#	 @classmethod
-#	 def parseTitle(cls, content):
-#		 re_htmltitle = re.compile(".*<title>(.*)</title>.*")
-#		 t = re_htmltitle.search(content)
-#		 try:
-#			 title = t.group(1)
-#		 except AttributeError:
-#			 title = '[No Title]'
-#		 
-#		 return title
-# 
-#	 @classmethod
-#	 def getContent(cls, url):
-#		 try:
-#			 h = urllib.urlopen(url)
-#			 content = h.read()
-#			 h.close()
-#			 h = urllib.urlopen(url)
-#		 except IOError, e:
-#			 print >>sys.stderr, ("Error: could not retrieve the content of a"
-#				 " URL. The bookmark will be saved, but its content won't be"
-#				 " searchable. URL: <%s>. Error: %s" % (url, e))
-#			 content = ''
-#		 except httplib.InvalidURL, e: #case: a redirect is giving me www.idealist.org:, which causes a fail during port-number search due to trailing :
-#			 print >>sys.stderr, ("Error: url or url redirect contained an"
-#			 "invalid  URL. The bookmark will be saved, but its content"
-#			 "won't be searchable. URL: <%s>. Error: %s" % (url, e))
-#			 content=''
-#		 return content
-
 
 class gitmarkRepoManager(object):
 
