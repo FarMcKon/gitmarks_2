@@ -56,7 +56,7 @@ def import_delicious_to_local_git(username, password='', url=None):
 			fh.write(content)
 			fh.close()
 			print "Saved problematic file as %s" % (saveFile)			
-		return
+		return -1
 	
 	# sample post: <post href="http://www.pixelbeat.org/cmdline.html" hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A practical reference" tag="linux tutorial reference" time="2010-11-29T01:07:35Z" extended="" meta="c79362665abb0303d577b6b9aa341599" />
 
@@ -105,7 +105,7 @@ def import_delicious_to_local_git(username, password='', url=None):
 		print "adding mark %s to repo %s" %(str(mark.title), str(mark.private) )
 		err = addToRepo(mark,doPush=False)
 		print "mark add error %s" %str(err)	
-
+	return 0
 
 # -- hack test main for when yahoo sucks and I need to test
 if __name__ == '__offfline_main__':
