@@ -105,7 +105,7 @@ def addToRepo(gitmarksObj, doPush = True):
 	""" addToRepo function that does all of the heavy lifting"""
 	if(gitmarksObj.private != True):
 		return addToPublicRepo(gitmarksObj, doPush)
-	print "adding mark %d to private repo" %str(gitmarkObj)
+	print "adding mark %s to private repo" %str(gitmarksObj)
 	return  addToPrivateRepo(gitmarksObj, doPush)
 
 		
