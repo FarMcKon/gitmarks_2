@@ -8,6 +8,7 @@ import re
 import csv
 import subprocess
 import time
+import logging
 from optparse import OptionParser
 import json
 import hashlib
@@ -37,7 +38,7 @@ class gitmark(object):
 	creator = None
 	rights = None #creative commons rights string
 	tri = [] #transitionary resource locator. IRL bit.ly, goo.gl, etc
-	content = ''  #content of the site. Lazyloads and should do smart local/away fetch
+	content = None  #content of the site. Lazyloads and should do smart local/away fetch
 	title = None
 	extended = None
 	meta = None
@@ -62,7 +63,7 @@ class gitmark(object):
 	def addTags(self, stringList):
 		#if we have more than 1 quote, split by quotes
 		if(stringList.count('"') > 1):
-			print 'has qouted string! We fail'
+			logging.error('has qouted string! We fail')
 		else :
 			list = stringList.split(',')
 			list = [ l.lstrip().rstrip() for l in list]
@@ -143,11 +144,15 @@ class gitmark(object):
 		content is specified, then that content is written instead
 		of the content in this gitmark
 		"""
+		if content == None:
+			if self.content == None:
+				self.getContent()
+			content = self.content
 		# -- lazily git store any existing file if necessary
 		if os.path.isfile(target_file) :
 			#check the md5 sum of the contet of this file, 
 			#if it does NOT match our new content, then 
-			print "do magic here to md5 sum, and cache file if needed"
+			logging.error("do magic here to md5 sum, and cache file if needed")
 		if content == None:
 			content = self.content 
 		self.cls_saveContent(target_file, content)
@@ -157,20 +162,20 @@ class gitmark(object):
 		This method causes a gitmark to
 		add itself to the local repository.
 		""" 
-		print "not used. old code. Use for reference only"
+		logging.error("not used. old code. Use for reference only")
 		exit(-5)
 		
-		print "adding myself to the local repository"
+		logging.info("adding myself to the local repository")
 		if(self.private != False):
-			print "this is a private mark. Encrypting not yet enabled. Do not store"
+			logging.info("this is a private mark. Encrypting not yet enabled. Do not store")
 		else :
 			# -- write gitmark
 			fname = os.path.join(localGitmarkDir,self.hash)
 			#fp = open(fname,"w")
-			print 'debug fwrite of file "%s"' % fp
-			print '---'
-			print self.JSONBlock()
-			print '---'
+			logging.info('debug fwrite of file "%s"' % fp)
+			logging.info('---')
+			logging.info( self.JSONBlock() )
+			logging.info('---')
 			#fwrite(self.JSONBlock())
 			#fclose(fp)
 			# add git add here
@@ -183,7 +188,7 @@ class gitmark(object):
 			tags = set(uglyTags.append(prettyTags))			
 			for tag in tags:
 				fname = os.path.join(localGitmarkDir,self.hash)
-				print 'tag filename "%s" ' %fname	
+				logging.info( 'tag filename "%s" ' %fname )
 				# add git add here
 			settings.TAG_SUB_PATH
 						
@@ -208,12 +213,12 @@ class gitmark(object):
 		""" tags, cleaned from delicious and make nicer looking"""
 		g = []
 		for t in self.tags:
-			print t
+			logging.info ( t )
 			if '_' in t:
 				g.append(t.replace('_',' '))
 			else:
 				g.append(t)
-			print g
+			logging.info( g )
 		return g
 			
 	def uglyTags(self):
@@ -238,12 +243,12 @@ class gitmark(object):
 			f.close()
 			del f
 			obj = json.loads(jsonObj)
-			print obj
+			logging.info( obj ) 
 			mark = gitmark(settings.USER_NAME)
 			mark.__dict__.update(obj) #force update dict from file
 			return mark 
 	
-		print "failed to read/load %s" %filename
+		logging.error( "failed to read/load %s" %filename)
 		return None
 	
 	@classmethod
@@ -263,11 +268,15 @@ class gitmark(object):
 		
 	@classmethod
 	def cls_getContent(cls, url):
+		""" Attempts to download content from the specified url, 
+		@return data from the specified URL 
+		"""
 		try:
 			h = urllib.urlopen(url)
 			content = h.read()
 			h.close()
 			h = urllib.urlopen(url)
+
 		except IOError, e:
 			print >>sys.stderr, ("Error: could not retrieve the content of a"
 			" URL. The bookmark will be saved, but its content won't be"
@@ -282,9 +291,10 @@ class gitmark(object):
 	
 	@classmethod
 	def cls_parseTitle(cls, content):
+		if content == None : return '[No Title]'
 		re_htmltitle = re.compile(".*<title>(.*)</title>.*")
-		t = re_htmltitle.search(content)
 		try:
+			t = re_htmltitle.search(content)
 			title = t.group(1)
 		except AttributeError:
 			title = '[No Title]'
@@ -318,7 +328,7 @@ class gitmark(object):
 		# TRICKTY: sets the environment over to the base directory of the gitmarks base
 		cwd_dir = os.path.abspath(os.getcwd())
 		if gitBaseDir: os.chdir(os.path.abspath(gitBaseDir))
-		print os.getcwd()
+		logging.info( os.getcwd() ) 
 		pipe = subprocess.Popen("git push origin master", shell=True) #Tricky: shell must be true
 		pipe.wait()
 		if gitBaseDir: 	os.chdir(cwd_dir)
@@ -326,6 +336,6 @@ class gitmark(object):
 class gitmarkRepoManager(object):
 
 	def __init__(self):
-		print "initalizing a repo manager"
+		logging.info( "initalizing a repo manager")
 		
 	
