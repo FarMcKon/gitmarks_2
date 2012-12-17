@@ -5,7 +5,7 @@ Gitmarks is:
 
 * A peer to peer web bookmark manager. This tool is a way to privately share bookmarks to your friends, without using a centralized server.  
 
-* A local webpage cache system, so you can track websites over time, and keep copies of old content, along with a md5 hash and other metadata to verify that the page is what you expect/know.
+* A local webpage cache system, so you can track websites over time, and keep copies of old content, along with an md5 hash, and other metadata to verify that the page is what you expect/know.
 
 * A tool to pull bookmarks from a system like Delicious, and save them into gitmarks, so you do not lose existing bookmarks you may have saved in other systems. 
 
@@ -31,7 +31,7 @@ Or you can add bookmarks directly at the command line by running
 ====
 Details
 ====
-Gitmarks uses 2 git repositories for your bookmarks. One stores public bookmarks (called 'public' ) and the second stores private bookmarks ( called 'private') a 3rd optional repositroy 'cache' can be used to store a local cache of all of your bookmark files.  The cache will be update <TBD>
+Gitmarks uses 2 git repositories for your bookmarks. One stores public bookmarks (called 'public' ) and the second stores private bookmarks ( called 'private') a 3rd optional repository 'cache' can be used to store a local cache of all of your bookmark files.  The cache will be update <TBD>
 
 Each time you bookmark a URL gitmarks will:
  - Create a bookmark file from the bookmark and tags
