@@ -43,7 +43,7 @@ def process_gitmarks_cmd(opts, args):
 
 	# -- each arg is a URL. 	
 	for arg in args:
-		g = gitmark(arg,settings.USER_NAME)
+		g = gitMark(arg,settings.USER_NAME)
 		if 'tags' in opts.keys():			g.addTags(opts['tags'])
 		if 'private' in opts.keys():		g.setPrivacy(opts['private'])
 
