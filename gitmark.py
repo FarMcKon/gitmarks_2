@@ -244,7 +244,7 @@ class gitMark(object):
 			del f
 			obj = json.loads(jsonObj)
 			logging.info( obj ) 
-			mark = gitmark(settings.USER_NAME)
+			mark = gitMark(settings.USER_NAME)
 			mark.__dict__.update(obj) #force update dict from file
 			return mark 
 	
