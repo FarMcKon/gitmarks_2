@@ -20,7 +20,7 @@ import json
 import logging
 # -- Our own gitmarks settings
 import settings
-from gitmark import gitmark
+from gitmark import gitMark
 from gitmark import USE_SHELL
 
 

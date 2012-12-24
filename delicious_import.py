@@ -13,7 +13,7 @@ import logging
 from xml.dom import minidom
 from xml.parsers import expat
 
-from gitmark import gitmark
+from gitmark import gitMark
 from gitmark_add import addToRepo, addToPublicRepo
 
 def cache_to_local_file(local_file, content):
