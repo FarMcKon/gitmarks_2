@@ -13,7 +13,7 @@ import logging
 from xml.dom import minidom
 from xml.parsers import expat
 
-from gitmark import gitmark
+from gitmark import gitMark
 from gitmark_add import addToRepo, addToPublicRepo
 
 def cache_to_local_file(local_file, content):
@@ -81,7 +81,7 @@ def import_delicious_to_local_git(username, password='', url=None, doCache=True)
 			tags = [tag.lstrip().rstrip() for tag in raw_tags.split()]
 			privateString = post.getAttribute('private')
 			
-			g = gitmark(url, 'delicious:'+ str(username))
+			g = gitMark(url, 'delicious:'+ str(username))
 			g.description = desc 
 			g.tags = tags
 			g.time = timestamp
@@ -131,7 +131,7 @@ if __name__ == '__offfline_main__':
 		"time": "2011-02-05T21:16:48Z",
 		"tags": ["ssh", "scp", "linux_tutorial","howto"]}
 
-	g = gitmark(x['uri'], x['creator'])
+	g = gitMark(x['uri'], x['creator'])
 	g.description = x['description']
 	g.tags = x['tags']
 	g.time = x['time']

@@ -25,7 +25,7 @@ GITMARK_VER_STRING = 'gitmark.0.2'
 USE_SHELL = os.name == 'nt'
 
 
-class gitmark(object):
+class gitMark(object):
 	# -- GitMarks members
 	# If you add member variables you don't want in a gitmark, delete them in JSONBlock below
 	# Otherwise self.__dict__ works rong.
@@ -244,7 +244,7 @@ class gitmark(object):
 			del f
 			obj = json.loads(jsonObj)
 			logging.info( obj ) 
-			mark = gitmark(settings.USER_NAME)
+			mark = gitMark(settings.USER_NAME)
 			mark.__dict__.update(obj) #force update dict from file
 			return mark 
 	
