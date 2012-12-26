@@ -50,7 +50,7 @@ It's great for groups to collaboratively collect bookmarks in one spot (thanks t
 Usage
 =====
 
-python gitmark.py [url]
+python gitmark_add.py [url]
 
 options:
 	-p = do not push to origin (store bookmark locally only)
