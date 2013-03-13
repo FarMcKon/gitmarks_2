@@ -24,7 +24,7 @@ You will be promoted to create a github account and directories if you use defau
 
 3) Start adding bookmarks!
 You can import your delicious bookmarks via 
- 'python delicious_imports.py'
+ 'python delicious_import.py'
 Or you can add bookmarks directly at the command line by running 
  'gitmark.py [options] uri'
 
