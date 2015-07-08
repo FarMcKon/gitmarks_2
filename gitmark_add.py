@@ -3,20 +3,17 @@
 """
 gitmark_add.py
 
-Functions and classes to add data to a local gitmarks directory. 
+Functions and classes to add data to a local gitmarks directory.
 
 Based on gitmarks by Hilary Mason on 2010-09-24.
 Copyright 2010 by Far McKon (intermediate while picking a opensource license)
 """
 
 import sys, os
-import urllib, httplib
-import re
-import csv
+import urllib
 import subprocess
 import time
 from optparse import OptionParser
-import json
 import logging
 # -- Our own gitmarks settings
 import settings
@@ -24,7 +21,7 @@ from gitmark import gitMark
 from gitmark import USE_SHELL
 
 
-def canHazWebs(): 
+def canHazWebs():
 	""" Returns true/false if I can't ping google,
 	which is used as a 'can I reach the internet?' test """
 	try:
@@ -38,38 +35,38 @@ def canHazWebs():
 	return False
 
 def process_gitmarks_cmd(opts, args):
-	""" processes a gitmarks command opts is list of options. 
+	""" processes a gitmarks command opts is list of options.
 	args is 1 or more URL's to process. """
 
-	# -- each arg is a URL. 	
+	# -- each arg is a URL.
 	for arg in args:
 		g = gitMark(arg,settings.USER_NAME)
 		if 'tags' in opts.keys():			g.addTags(opts['tags'])
 		if 'private' in opts.keys():		g.setPrivacy(opts['private'])
 
-		# -- get content, and autogen title 
+		# -- get content, and autogen title
 		if canHazWebs():
 			g.getContent()
 			g.parseTitle()
 		else:
 			logging.error("no netz! overriding push to false!")
 			opts['push'] = False
-		
-		doPush = opts['push'] if 'push' in opts.keys() else 'False'  	
+
+		doPush = opts['push'] if 'push' in opts.keys() else 'False'
 		updateRepoWith(g, doPush)
-		
+
 def updateRepoWith(gitmarksObj, doPush = True):
 	""" Update a repository with the passed gitmarksObject. This can also be flagged
 	to push that update to the remote repository."""
 	# -- see if we need to add or update the mark
-	if not isInGitmarkPublicRepo(gitmarksObj):		
+	if not isInGitmarkPublicRepo(gitmarksObj):
 		return addToRepo(gitmarksObj, doPush)
 	else:
 		logging.warning("This bookmark is already in our repo. update?")
 		#TODO: write/run/do system to update gitmark
 		return updateExistingInRepo(gitmarksObj, doPush)
-	return -1; 
-		
+	return -1;
+
 def updateExistingInRepo(gitmarksObj, doPush = True):
 	""" Updates an existing gitmark file(s) on disk. """
 	if(gitmarksObj.private != True):
@@ -82,12 +79,12 @@ def updateToPublicRepo(gitmarksObj, doPush):
 	logging.info("HACK: Do we want to push/pull before/after doing this operation?"	)
 	# -- TODO: decide if we want to pull before doing this operation,
 	# and/or push after doing this operation
-	
-	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
+
+	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR,
 		settings.BOOKMARK_SUB_PATH, gitmarksObj.hash)
 
 	# -- Check for tags differences
-	oldMark = gitmark.cls_hydrate(filename)
+	oldMark = gitMark.cls_hydrate(filename)
 		# -- TODO add new tags
 		# -- TODO remove old tags
 	# -- TODO check for description differences
@@ -100,16 +97,16 @@ def updateToPrivateRepo(gitmarksObj, doPush):
 	logging.warning("no such thing to update private repo, encryption not yet installed")
 	exit(-5)
 
-	
-	
-def addToRepo(gitmarksObj, doPush = True):		
+
+
+def addToRepo(gitmarksObj, doPush = True):
 	""" addToRepo function that does all of the heavy lifting"""
 	if(gitmarksObj.private != True):
 		return addToPublicRepo(gitmarksObj, doPush)
 	logging.info("adding mark %s to private repo" %str(gitmarksObj))
 	return  addToPrivateRepo(gitmarksObj, doPush)
 
-		
+
 def addToPrivateRepo(gitmarksObj, doPush = True):
 	#TODO: set this a pep8 private function name
 	""" add to the public repository """
@@ -117,13 +114,13 @@ def addToPrivateRepo(gitmarksObj, doPush = True):
 		logging.error("this is a public mark. Use 'addToPublicRepo for this")
 		return -1
 	# -- add to our public 'bookmarks'
-	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PRIVATE_GITMARK_REPO_DIR, 
+	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PRIVATE_GITMARK_REPO_DIR,
 		settings.BOOKMARK_SUB_PATH, gitmarksObj.hash)
 	filename = os.path.normpath(filename)
 	filename = os.path.abspath(filename)
 	# -get our string
 	gitmarksObj.setTimeIfEmpty()
-	bm_string = gitmarksObj.JSONBlock() 
+	bm_string = gitmarksObj.JSONBlock()
 	gitmarksBaseDir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
 
 
@@ -136,14 +133,14 @@ def addToPrivateRepo(gitmarksObj, doPush = True):
 		fh.write(bm_string)
 		fh.close()
 		del fh
-		gitmark.gitAdd([filename,],gitmarksObj.time,gitmarksBaseDir)
+		gitMark.gitAdd([filename,],gitmarksObj.time,gitmarksBaseDir)
 
 	# -- add to each of our our public 'tags' listings
 	tag_info_string = gitmarksObj.miniJSONBlock()
 
 	tagFilesWrittenSuccess = []
 	for tag in gitmarksObj.everyPossibleTagList():
-		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
+		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR,
 		settings.TAG_SUB_PATH, tag)
 		filename = os.path.normpath(filename)
 		filename = os.path.abspath(filename)
@@ -154,31 +151,31 @@ def addToPrivateRepo(gitmarksObj, doPush = True):
 			fh.close()
 			tagFilesWrittenSuccess.append(filename)
 			del fh
-	gitmark.gitAdd(tagFilesWrittenSuccess,gitmarksObj.time, gitmarksBaseDir)
+	gitMark.gitAdd(tagFilesWrittenSuccess,gitmarksObj.time, gitmarksBaseDir)
 
 
 	# -- if we should get content, go get it and store it locally
 	if settings.GET_CONTENT and gitmarksObj.noContentSet() == False:
 		logging.info("get content? Don't mind of I do...")
-		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR, 
+		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR,
 		settings.HTML_SUB_PATH, gitmarksObj.hash)
 		#check if we have a cache directory
-		c_dir  = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR, 
+		c_dir  = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR,
 		settings.HTML_SUB_PATH)
 		if os.path.isdir(c_dir) == False:
 			subprocess.call(['mkdir','-p',c_dir],shell=USE_SHELL)
 		gitmarksObj.cacheContent(filename)
-		
+
 	#TOOD: do something about committing our changes
 	logging.info("git commit (local)? Don't mind if i do....")
 	msg = "auto commit from delicious import beta test %s" %time.strftime("%Y-%m-%dT%H:%M:%SZ")
-	gitmark.gitCommit(msg, gitmarksBaseDir )
+	gitMark.gitCommit(msg, gitmarksBaseDir )
 
 	if doPush:
 		logging.info("git push (external)? Don't mind if i do....")
-		gitmark.gitPush(gitmarksBaseDir )
-	
-			
+		gitMark.gitPush(gitmarksBaseDir )
+
+
 def addToPublicRepo(gitmarksObj, doPush = True):
 	#TODO: set this a pep8 private function name
 	""" Adds a gitmark to the local public repository """
@@ -188,13 +185,13 @@ def addToPublicRepo(gitmarksObj, doPush = True):
 		return -1
 
 	# -- add to our public 'bookmarks'
-	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
+	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR,
 		settings.BOOKMARK_SUB_PATH, gitmarksObj.hash)
 	filename = os.path.normpath(filename)
 	filename = os.path.abspath(filename)
 	# -get our string
 	gitmarksObj.setTimeIfEmpty()
-	bm_string = gitmarksObj.JSONBlock() 
+	bm_string = gitmarksObj.JSONBlock()
 	gitmarksBaseDir = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR)
 
 
@@ -207,14 +204,14 @@ def addToPublicRepo(gitmarksObj, doPush = True):
 		fh.write(bm_string)
 		fh.close()
 		del fh
-		gitmark.gitAdd([filename,],gitmarksObj.time,gitmarksBaseDir)
+		gitMark.gitAdd([filename,],gitmarksObj.time,gitmarksBaseDir)
 
 	# -- add to each of our our public 'tags' listings
 	tag_info_string = gitmarksObj.miniJSONBlock()
 
 	tagFilesWrittenSuccess = []
 	for tag in gitmarksObj.everyPossibleTagList():
-		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
+		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR,
 		settings.TAG_SUB_PATH, tag)
 		filename = os.path.normpath(filename)
 		filename = os.path.abspath(filename)
@@ -225,40 +222,40 @@ def addToPublicRepo(gitmarksObj, doPush = True):
 			fh.close()
 			tagFilesWrittenSuccess.append(filename)
 			del fh
-	gitmark.gitAdd(tagFilesWrittenSuccess,gitmarksObj.time, gitmarksBaseDir)
+	gitMark.gitAdd(tagFilesWrittenSuccess,gitmarksObj.time, gitmarksBaseDir)
 
 
 	# -- if we should get content, go get it and store it locally
 	if settings.GET_CONTENT and gitmarksObj.noContentSet() == False:
 		logging.info("get content? Don't mind of I do...")
 
-		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR, 
+		filename = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR,
 		settings.HTML_SUB_PATH, gitmarksObj.hash)
 		#check if we have a cache directory
-		c_dir  = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR, 
+		c_dir  = os.path.join(settings.GITMARK_BASE_DIR, settings.CONTENT_GITMARK_DIR,
 		settings.HTML_SUB_PATH)
 		if os.path.isdir(c_dir) == False:
 			subprocess.call(['mkdir','-p',c_dir],shell=USE_SHELL)
 		gitmarksObj.cacheContent(filename)
-		
+
 	#TOOD: do something about committing our changes
 	logging.info("git commit (local)? Don't mind if i do....")
 	msg = "auto commit from delicious import beta test %s" %time.strftime("%Y-%m-%dT%H:%M:%SZ")
-	gitmark.gitCommit(msg, gitmarksBaseDir )
+	gitMark.gitCommit(msg, gitmarksBaseDir )
 
 	if doPush:
 		logging.info("git push (external)? Don't mind if i do....")
-		gitmark.gitPush(gitmarksBaseDir )
-		
-	
+		gitMark.gitPush(gitmarksBaseDir )
+
+
 def isInGitmarkPublicRepo(gitmarkObj):
 	""" Checks if a gitmarks object is already in the public repository
 	by checking for it's' hash in our public bookmarks directory. """
 	if(gitmarkObj.hash == None):
-		return False		
-	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR, 
+		return False
+	filename = os.path.join(settings.GITMARK_BASE_DIR, settings.PUBLIC_GITMARK_REPO_DIR,
 	settings.BOOKMARK_SUB_PATH, gitmarkObj.hash)
-	return os.path.isfile(filename) 
+	return os.path.isfile(filename)
 
 
 if __name__ == '__main__':
@@ -278,5 +275,5 @@ if __name__ == '__main__':
 
 	(options, args) = parser.parse_args()
 	opts = {'push': options.push, 'tags': options.tags, 'msg': options.msg, 'content':options.content, 'private':options.private}
-		
+
 	g = process_gitmarks_cmd(opts, args)
